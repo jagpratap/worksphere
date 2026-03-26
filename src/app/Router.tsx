@@ -41,7 +41,24 @@ export function Router() {
               children: [
                 {
                   element: <AuthLayout />,
-                  children: [],
+                  children: [
+                    {
+                      path: paths.auth.signin.path,
+                      lazy: lazyRoute(() => import("./routes/auth/SignIn")),
+                    },
+                    {
+                      path: paths.auth.signup.path,
+                      lazy: lazyRoute(() => import("./routes/auth/SignUp")),
+                    },
+                    {
+                      path: paths.auth.forgotPassword.path,
+                      lazy: lazyRoute(() => import("./routes/auth/ForgotPassword")),
+                    },
+                    {
+                      path: paths.auth.resetPassword.path,
+                      lazy: lazyRoute(() => import("./routes/auth/ResetPassword")),
+                    },
+                  ],
                 },
               ],
             },
