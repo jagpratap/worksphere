@@ -5,7 +5,7 @@ import { ErrorFallback } from "@/components/common/ErrorFallback";
 import { FullPageSpinner } from "@/components/common/FullPageSpinner";
 import { paths } from "@/config/paths";
 
-import { AuthGuard, GuestGuard } from "./guards";
+import { AuthGuard, GuestGuard, RoleGuard } from "./guards";
 import { AuthLayout, ProtectedLayout, PublicLayout, RootLayout } from "./layouts";
 import { rootLoader } from "./loader";
 
@@ -72,7 +72,59 @@ export function Router() {
           children: [
             {
               element: <ProtectedLayout />,
-              children: [],
+              children: [
+                // ── Admin ── /admin/* ─────────────────────────────────────
+                {
+                  element: <RoleGuard />,
+                  children: [
+                    {
+                      path: paths.admin.root.path,
+                      lazy: lazyRoute(() => import("./routes/admin/Dashboard")),
+                    },
+                  ],
+                },
+
+                // ── App (Manager) ── /app/* ─────────────────────────────────
+                {
+                  element: <RoleGuard />,
+                  children: [
+                    {
+                      path: paths.app.root.path,
+                      lazy: lazyRoute(() => import("./routes/app/Dashboard")),
+                    },
+                  ],
+                },
+
+                // ── My (Member) ── /my/* ──────────────────────────────────
+                {
+                  element: <RoleGuard />,
+                  children: [
+                    {
+                      path: paths.my.tasks.root.path,
+                      lazy: lazyRoute(() => import("./routes/my/Tasks")),
+                    },
+                  ],
+                },
+
+                // ── Shared (Admin, Manager, Member) ── /shared/* ─────────────
+                {
+                  element: <RoleGuard />,
+                  children: [
+                    {
+                      path: paths.shared.profile.path,
+                      lazy: lazyRoute(() => import("./routes/shared/Profile")),
+                    },
+                    {
+                      path: paths.shared.settings.path,
+                      lazy: lazyRoute(() => import("./routes/shared/Settings")),
+                    },
+                    {
+                      path: paths.shared.notifications.path,
+                      lazy: lazyRoute(() => import("./routes/shared/Notifications")),
+                    },
+                  ],
+                },
+              ],
             },
           ],
         },

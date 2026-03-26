@@ -1,4 +1,4 @@
 export * from "./Auth";
-export * from "./Protected";
+export * from "./protected";
 export * from "./Public";
 export * from "./Root";
