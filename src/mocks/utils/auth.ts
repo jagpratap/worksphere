@@ -1,3 +1,5 @@
+import type { PathParams } from "msw";
+
 import type { Role } from "@/constants";
 
 import { USER_STATUS } from "@/constants";
@@ -12,6 +14,7 @@ import { mswStore } from "./store-persistence";
 type AuthContext = {
   claims: JWTPayload;
   user: MockUser;
+  params: PathParams;
 };
 
 type ProtectedHandler = (
@@ -20,7 +23,13 @@ type ProtectedHandler = (
 ) => Promise<Response>;
 
 export function withAuth(handler: ProtectedHandler) {
-  return async ({ request }: { request: Request }) => {
+  return async ({
+    request,
+    params,
+  }: {
+    request: Request;
+    params: PathParams;
+  }) => {
     const token = extractBearer(request.headers.get("Authorization"));
 
     if (!token) {
@@ -59,7 +68,7 @@ export function withAuth(handler: ProtectedHandler) {
       });
     }
 
-    return handler({ claims, user }, request);
+    return handler({ claims, user, params }, request);
   };
 }
 

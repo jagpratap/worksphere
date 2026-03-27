@@ -10,26 +10,27 @@ export async function startMSW(): Promise<void> {
     },
   });
 
-  /*
-   * ── Dev Utilities (browser console) ──────────────────────────────
-   *
-   * __mswReset()     — Wipes all MSW localStorage state and reloads the page.
-   *                    Useful when fixture data gets into a bad state.
-   *
-   * __mswUsers()     — Prints a table of all users (fixture + registered)
-   *                    with email, role, and status. Useful for quickly
-   *                    finding sign-in credentials when testing role-based flows.
-   * Example:
-   *   window.__mswReset()      → clears everything, fresh start
-   *   window.__mswUsers()      → console.table of all available users
-   */
-  (window as unknown as Record<string, unknown>).__mswReset = () => {
+  // ── Dev Utilities (browser console) ──────────────────────────────────────
+
+  const w = window as unknown as Record<string, unknown>;
+
+  w.__mswReset = () => {
     mswStore.clearAll();
     window.location.reload();
   };
 
-  (window as unknown as Record<string, unknown>).__mswUsers = () => {
+  w.__mswUsers = () => {
     const users = mswStore.getUsers();
     console.table(users.map(u => ({ email: u.email, role: u.role, status: u.status })));
+  };
+
+  w.__mswProjects = () => {
+    const projects = mswStore.getProjects();
+    console.table(projects.map(p => ({ id: p.id, key: p.key, name: p.name, status: p.status, owner: p.ownerId })));
+  };
+
+  w.__mswTasks = () => {
+    const tasks = mswStore.getTasks();
+    console.table(tasks.map(t => ({ id: t.id, key: t.key, title: t.title, status: t.status, project: t.projectId })));
   };
 }

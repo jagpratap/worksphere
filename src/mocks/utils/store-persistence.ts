@@ -1,15 +1,21 @@
+import type { MockProject } from "../fixtures/projects";
+import type { MockTask } from "../fixtures/tasks";
 import type { MockUser } from "../fixtures/users";
 
+import { FIXTURE_PROJECTS } from "../fixtures/projects";
+import { FIXTURE_TASKS } from "../fixtures/tasks";
 import { FIXTURE_USERS } from "../fixtures/users";
 
 /* =========================================================
    Keys
 ========================================================= */
 const KEYS = {
+  users: "msw:users",
+  tasks: "msw:tasks",
+  projects: "msw:projects",
   refreshTokenStore: "msw:refreshTokenStore",
-  registeredUsers: "msw:registeredUsers",
-  passwordResetTokenStore: "msw:passwordResetTokenStore",
   emailVerificationStore: "msw:emailVerificationStore",
+  passwordResetTokenStore: "msw:passwordResetTokenStore",
 } as const;
 
 /* =========================================================
@@ -17,6 +23,49 @@ const KEYS = {
 ========================================================= */
 type RefreshTokenEntry = { userId: string; createdAt: number };
 type TokenExpiryEntry = { token: string; expiresAt: number };
+
+/* =========================================================
+   Task Key Counter
+========================================================= */
+
+const TASK_COUNTERS = new Map<string, number>();
+
+function initCounter(projectKey: string, tasks: MockTask[]): number {
+  const prefix = `${projectKey}-`;
+  return tasks
+    .filter(t => t.key.startsWith(prefix))
+    .reduce((max, t) => {
+      const num = Number.parseInt(t.key.slice(prefix.length), 10);
+      return Number.isNaN(num) ? max : Math.max(max, num);
+    }, 0);
+}
+
+/* =========================================================
+   Persisted Collection Helpers
+========================================================= */
+
+function readCollection<T>(key: string, seed: T[]): T[] {
+  try {
+    const raw = localStorage.getItem(key);
+    if (raw)
+      return JSON.parse(raw);
+    // First access — seed from fixtures
+    localStorage.setItem(key, JSON.stringify(seed));
+    return [...seed];
+  }
+  catch {
+    return [...seed];
+  }
+}
+
+function writeCollection<T>(key: string, data: T[]): void {
+  try {
+    localStorage.setItem(key, JSON.stringify(data));
+  }
+  catch {
+    console.warn(`[MSW] Failed to persist ${key}`);
+  }
+}
 
 export const mswStore = {
   // ── Refresh Tokens ──────────────────────────────────────────────────────
@@ -60,14 +109,7 @@ export const mswStore = {
 
   // ── Users ────────────────────────────────────────────────
   getUsers(): MockUser[] {
-    try {
-      const raw = localStorage.getItem(KEYS.registeredUsers);
-      const registered: MockUser[] = raw ? JSON.parse(raw) : [];
-      return [...FIXTURE_USERS, ...registered];
-    }
-    catch {
-      return [...FIXTURE_USERS];
-    }
+    return readCollection<MockUser>(KEYS.users, FIXTURE_USERS);
   },
 
   findUserByEmail(email: string): MockUser | null {
@@ -79,43 +121,99 @@ export const mswStore = {
   },
 
   addUser(user: MockUser): void {
-    try {
-      const raw = localStorage.getItem(KEYS.registeredUsers);
-      const registered: MockUser[] = raw ? JSON.parse(raw) : [];
-      registered.push(user);
-      localStorage.setItem(KEYS.registeredUsers, JSON.stringify(registered));
-    }
-    catch {
-      console.warn("[MSW] Failed to add user");
-    }
+    const users = this.getUsers();
+    users.push(user);
+    writeCollection(KEYS.users, users);
   },
 
-  /**
-   * Updates a user by ID. Fixture users are updated in-memory only (reset on
-   * page reload), while registered users are persisted to localStorage.
-   */
   updateUser(id: string, updates: Partial<MockUser>): void {
-    try {
-      const fixtureIds = new Set(FIXTURE_USERS.map(u => u.id));
+    const users = this.getUsers();
+    const index = users.findIndex(u => u.id === id);
+    if (index === -1)
+      return;
+    users[index] = { ...users[index], ...updates };
+    writeCollection(KEYS.users, users);
+  },
 
-      if (fixtureIds.has(id)) {
-        const index = FIXTURE_USERS.findIndex(u => u.id === id);
-        if (index !== -1)
-          Object.assign(FIXTURE_USERS[index], updates);
-        return;
-      }
+  // ── Projects ────────────────────────────────────────────────────────────
+  getProjects(): MockProject[] {
+    return readCollection<MockProject>(KEYS.projects, FIXTURE_PROJECTS);
+  },
 
-      const raw = localStorage.getItem(KEYS.registeredUsers);
-      const registered: MockUser[] = raw ? JSON.parse(raw) : [];
-      const index = registered.findIndex(u => u.id === id);
-      if (index === -1)
-        return;
-      registered[index] = { ...registered[index], ...updates };
-      localStorage.setItem(KEYS.registeredUsers, JSON.stringify(registered));
+  findProjectById(id: string): MockProject | null {
+    return this.getProjects().find(p => p.id === id) ?? null;
+  },
+
+  addProject(project: MockProject): void {
+    const projects = this.getProjects();
+    projects.push(project);
+    writeCollection(KEYS.projects, projects);
+  },
+
+  updateProject(id: string, updates: Partial<MockProject>): void {
+    const projects = this.getProjects();
+    const index = projects.findIndex(p => p.id === id);
+    if (index === -1)
+      return;
+    projects[index] = { ...projects[index], ...updates };
+    writeCollection(KEYS.projects, projects);
+  },
+
+  deleteProject(id: string): void {
+    const projects = this.getProjects();
+    writeCollection(KEYS.projects, projects.filter(p => p.id !== id));
+  },
+
+  // ── Tasks ───────────────────────────────────────────────────────────────
+  getTasks(): MockTask[] {
+    return readCollection<MockTask>(KEYS.tasks, FIXTURE_TASKS);
+  },
+
+  getTasksByProject(projectId: string): MockTask[] {
+    return this.getTasks().filter(t => t.projectId === projectId);
+  },
+
+  getTasksByAssignee(userId: string): MockTask[] {
+    return this.getTasks().filter(t => t.assigneeId === userId);
+  },
+
+  findTaskById(id: string): MockTask | null {
+    return this.getTasks().find(t => t.id === id) ?? null;
+  },
+
+  addTask(task: MockTask): void {
+    const tasks = this.getTasks();
+    tasks.push(task);
+    writeCollection(KEYS.tasks, tasks);
+  },
+
+  updateTask(id: string, updates: Partial<MockTask>): void {
+    const tasks = this.getTasks();
+    const index = tasks.findIndex(t => t.id === id);
+    if (index === -1)
+      return;
+    tasks[index] = { ...tasks[index], ...updates };
+    writeCollection(KEYS.tasks, tasks);
+  },
+
+  deleteTask(id: string): void {
+    const tasks = this.getTasks();
+    writeCollection(KEYS.tasks, tasks.filter(t => t.id !== id));
+  },
+
+  deleteTasksByProject(projectId: string): void {
+    const tasks = this.getTasks();
+    writeCollection(KEYS.tasks, tasks.filter(t => t.projectId !== projectId));
+  },
+
+  // ── Task Key Generation ─────────────────────────────────────────────────
+  getNextTaskKey(projectKey: string): string {
+    if (!TASK_COUNTERS.has(projectKey)) {
+      TASK_COUNTERS.set(projectKey, initCounter(projectKey, this.getTasks()));
     }
-    catch {
-      console.warn("[MSW] Failed to update user");
-    }
+    const next = TASK_COUNTERS.get(projectKey)! + 1;
+    TASK_COUNTERS.set(projectKey, next);
+    return `${projectKey}-${next}`;
   },
 
   // ── Dev Utils ────────────────────────────────────────────
@@ -127,7 +225,6 @@ export const mswStore = {
       catch { console.warn(`[MSW] Failed to clear ${key}`); }
     });
   },
-
 };
 
 /* =========================================================

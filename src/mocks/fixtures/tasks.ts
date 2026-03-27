@@ -1,0 +1,264 @@
+import type { Task } from "@/types";
+
+import { TASK_PRIORITY, TASK_STATUS } from "@/constants";
+
+export type MockTask = Task;
+
+export const FIXTURE_TASKS: MockTask[] = [
+  // ── WSP — WorkSphere (6 tasks) ────────────────────────────────────────────
+  {
+    id: "task_001",
+    projectId: "proj_001",
+    key: "WSP-1",
+    title: "Set up project structure",
+    description: "Initialize monorepo with Vite, TypeScript, and ESLint config.",
+    status: TASK_STATUS.DONE,
+    priority: TASK_PRIORITY.MEDIUM,
+    assigneeId: "usr_005", // Carol
+    order: 0,
+    createdAt: "2024-06-02T09:00:00.000Z",
+    updatedAt: "2024-06-10T17:00:00.000Z",
+  },
+  {
+    id: "task_002",
+    projectId: "proj_001",
+    key: "WSP-2",
+    title: "Design database schema",
+    description: "Define tables for users, projects, tasks, and sprints.",
+    status: TASK_STATUS.DONE,
+    priority: TASK_PRIORITY.HIGH,
+    assigneeId: "usr_006", // Frank
+    order: 1,
+    createdAt: "2024-06-03T10:00:00.000Z",
+    updatedAt: "2024-06-15T12:00:00.000Z",
+  },
+  {
+    id: "task_003",
+    projectId: "proj_001",
+    key: "WSP-3",
+    title: "Implement authentication",
+    description: "JWT-based auth with refresh token rotation.",
+    status: TASK_STATUS.IN_REVIEW,
+    priority: TASK_PRIORITY.HIGH,
+    assigneeId: "usr_005", // Carol
+    order: 0,
+    createdAt: "2024-06-05T08:00:00.000Z",
+    updatedAt: "2025-03-10T09:00:00.000Z",
+  },
+  {
+    id: "task_004",
+    projectId: "proj_001",
+    key: "WSP-4",
+    title: "Build dashboard layout",
+    description: "Role-aware dashboard with sidebar navigation and header.",
+    status: TASK_STATUS.IN_PROGRESS,
+    priority: TASK_PRIORITY.MEDIUM,
+    assigneeId: "usr_007", // Grace
+    order: 0,
+    createdAt: "2024-06-08T11:00:00.000Z",
+    updatedAt: "2025-03-09T14:30:00.000Z",
+  },
+  {
+    id: "task_005",
+    projectId: "proj_001",
+    key: "WSP-5",
+    title: "Create API endpoints",
+    description: "RESTful endpoints for projects and tasks CRUD.",
+    status: TASK_STATUS.TODO,
+    priority: TASK_PRIORITY.HIGH,
+    assigneeId: "usr_006", // Frank
+    order: 0,
+    createdAt: "2024-06-10T09:00:00.000Z",
+    updatedAt: "2024-06-10T09:00:00.000Z",
+  },
+  {
+    id: "task_006",
+    projectId: "proj_001",
+    key: "WSP-6",
+    title: "Write unit tests",
+    description: "Test coverage for auth flow and permission utilities.",
+    status: TASK_STATUS.TODO,
+    priority: TASK_PRIORITY.LOW,
+    assigneeId: null,
+    order: 1,
+    createdAt: "2024-06-12T10:00:00.000Z",
+    updatedAt: "2024-06-12T10:00:00.000Z",
+  },
+
+  // ── MOB — Mobile App (5 tasks) ────────────────────────────────────────────
+  {
+    id: "task_007",
+    projectId: "proj_002",
+    key: "MOB-1",
+    title: "Design app wireframes",
+    description: "Low-fidelity wireframes for onboarding, home, and task views.",
+    status: TASK_STATUS.DONE,
+    priority: TASK_PRIORITY.MEDIUM,
+    assigneeId: "usr_009", // Isla
+    order: 0,
+    createdAt: "2024-07-16T09:00:00.000Z",
+    updatedAt: "2024-08-01T15:00:00.000Z",
+  },
+  {
+    id: "task_008",
+    projectId: "proj_002",
+    key: "MOB-2",
+    title: "Set up React Native project",
+    description: "Initialize project with Expo, navigation, and state management.",
+    status: TASK_STATUS.IN_PROGRESS,
+    priority: TASK_PRIORITY.HIGH,
+    assigneeId: "usr_006", // Frank
+    order: 0,
+    createdAt: "2024-08-05T10:00:00.000Z",
+    updatedAt: "2025-03-08T14:30:00.000Z",
+  },
+  {
+    id: "task_009",
+    projectId: "proj_002",
+    key: "MOB-3",
+    title: "Implement push notifications",
+    description: "Firebase Cloud Messaging integration for task reminders.",
+    status: TASK_STATUS.TODO,
+    priority: TASK_PRIORITY.MEDIUM,
+    assigneeId: "usr_010", // James
+    order: 0,
+    createdAt: "2024-08-10T11:00:00.000Z",
+    updatedAt: "2024-08-10T11:00:00.000Z",
+  },
+  {
+    id: "task_010",
+    projectId: "proj_002",
+    key: "MOB-4",
+    title: "Build onboarding flow",
+    description: "Multi-step onboarding with role selection and team invite.",
+    status: TASK_STATUS.TODO,
+    priority: TASK_PRIORITY.HIGH,
+    assigneeId: "usr_009", // Isla
+    order: 1,
+    createdAt: "2024-08-12T09:00:00.000Z",
+    updatedAt: "2024-08-12T09:00:00.000Z",
+  },
+  {
+    id: "task_011",
+    projectId: "proj_002",
+    key: "MOB-5",
+    title: "Performance optimization",
+    description: "Profile and optimize list rendering and image loading.",
+    status: TASK_STATUS.TODO,
+    priority: TASK_PRIORITY.LOW,
+    assigneeId: null,
+    order: 2,
+    createdAt: "2024-08-15T14:00:00.000Z",
+    updatedAt: "2024-08-15T14:00:00.000Z",
+  },
+
+  // ── DSN — Design System (4 tasks) ─────────────────────────────────────────
+  {
+    id: "task_012",
+    projectId: "proj_003",
+    key: "DSN-1",
+    title: "Create color palette",
+    description: "Define semantic color tokens for light and dark themes.",
+    status: TASK_STATUS.IN_REVIEW,
+    priority: TASK_PRIORITY.MEDIUM,
+    assigneeId: "usr_007", // Grace
+    order: 0,
+    createdAt: "2025-01-12T09:00:00.000Z",
+    updatedAt: "2025-03-12T11:00:00.000Z",
+  },
+  {
+    id: "task_013",
+    projectId: "proj_003",
+    key: "DSN-2",
+    title: "Build button components",
+    description: "Button variants: primary, secondary, ghost, destructive, link.",
+    status: TASK_STATUS.IN_PROGRESS,
+    priority: TASK_PRIORITY.HIGH,
+    assigneeId: "usr_012", // Leo
+    order: 0,
+    createdAt: "2025-01-15T10:00:00.000Z",
+    updatedAt: "2025-03-11T16:00:00.000Z",
+  },
+  {
+    id: "task_014",
+    projectId: "proj_003",
+    key: "DSN-3",
+    title: "Typography system",
+    description: "Font scale, line heights, and responsive type utilities.",
+    status: TASK_STATUS.TODO,
+    priority: TASK_PRIORITY.MEDIUM,
+    assigneeId: "usr_007", // Grace
+    order: 0,
+    createdAt: "2025-01-18T11:00:00.000Z",
+    updatedAt: "2025-01-18T11:00:00.000Z",
+  },
+  {
+    id: "task_015",
+    projectId: "proj_003",
+    key: "DSN-4",
+    title: "Icon library setup",
+    description: "Curate and integrate Lucide icon set with tree-shaking.",
+    status: TASK_STATUS.TODO,
+    priority: TASK_PRIORITY.LOW,
+    assigneeId: "usr_012", // Leo
+    order: 1,
+    createdAt: "2025-01-20T09:00:00.000Z",
+    updatedAt: "2025-01-20T09:00:00.000Z",
+  },
+
+  // ── AGW — API Gateway (4 tasks) ───────────────────────────────────────────
+  {
+    id: "task_016",
+    projectId: "proj_004",
+    key: "AGW-1",
+    title: "Rate limiting middleware",
+    description: "Token-bucket rate limiter with per-route configuration.",
+    status: TASK_STATUS.IN_PROGRESS,
+    priority: TASK_PRIORITY.URGENT,
+    assigneeId: "usr_005", // Carol
+    order: 0,
+    createdAt: "2024-09-22T08:00:00.000Z",
+    updatedAt: "2025-03-14T16:00:00.000Z",
+  },
+  {
+    id: "task_017",
+    projectId: "proj_004",
+    key: "AGW-2",
+    title: "Request validation layer",
+    description: "Zod-based request validation middleware for all endpoints.",
+    status: TASK_STATUS.TODO,
+    priority: TASK_PRIORITY.HIGH,
+    assigneeId: "usr_010", // James
+    order: 0,
+    createdAt: "2024-09-25T10:00:00.000Z",
+    updatedAt: "2024-09-25T10:00:00.000Z",
+  },
+  {
+    id: "task_018",
+    projectId: "proj_004",
+    key: "AGW-3",
+    title: "Logging and monitoring",
+    description: "Structured logging with request tracing and error tracking.",
+    status: TASK_STATUS.TODO,
+    priority: TASK_PRIORITY.MEDIUM,
+    assigneeId: null,
+    order: 1,
+    createdAt: "2024-10-01T09:00:00.000Z",
+    updatedAt: "2024-10-01T09:00:00.000Z",
+  },
+  {
+    id: "task_019",
+    projectId: "proj_004",
+    key: "AGW-4",
+    title: "API documentation",
+    description: "OpenAPI 3.0 spec with Swagger UI for all gateway routes.",
+    status: TASK_STATUS.IN_REVIEW,
+    priority: TASK_PRIORITY.LOW,
+    assigneeId: "usr_005", // Carol
+    order: 0,
+    createdAt: "2024-10-05T11:00:00.000Z",
+    updatedAt: "2025-03-13T10:00:00.000Z",
+  },
+
+  // ── MKT — Marketing Site: 0 tasks (tests empty board state) ───────────────
+];

@@ -9,3 +9,5 @@ export const EMAIL_VERIFY_TTL_MS = 24 * 60 * 60 * 1000; // 1 day
 
 // Base URLs
 export const AUTH_BASE_URL = "/api/auth";
+export const PROJECTS_BASE_URL = "/api/projects";
+export const TASKS_BASE_URL = "/api/tasks";

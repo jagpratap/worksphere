@@ -101,7 +101,7 @@ export const SUCCESS_MESSAGES = {
 
 type SuccessBody = {
   success: true;
-  data: Record<string, unknown>;
+  data: unknown;
   message: string;
 };
 
@@ -129,7 +129,7 @@ type FieldError = {
  * });
  */
 export function successResponse(
-  options: { data: SuccessBody["data"]; message: string; status?: number },
+  options: { data: unknown; message: string; status?: number },
 ) {
   const body: SuccessBody = {
     success: true,
