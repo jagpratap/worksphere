@@ -9,8 +9,8 @@ Building **WorkSphere** — a role-based project management SaaS (lightweight Ji
 **6-week roadmap:**
 
 - Week 1: Foundation & role infrastructure ✅
-- Week 2: Projects & task system (kanban) ← IN PROGRESS (Day 1-4 done)
-- Week 3: Sprint planning, time tracker, member experience
+- Week 2: Projects & task system (kanban) ✅
+- Week 3: Sprint planning, time tracker, member experience ← UP NEXT
 - Week 4: Admin features (user management, billing, audit log)
 - Week 5: Workload, notifications, polish
 - Week 6: Visual polish, performance, deploy
@@ -60,7 +60,7 @@ Building **WorkSphere** — a role-based project management SaaS (lightweight Ji
 - **Reusable utilities:** `PageBreadcrumb` (array-driven breadcrumb nav), `formatDate` (centralized date format), `getInitials` (first-letter initials from name words). All replace inline logic across components.
 - **Task keys:** Auto-incrementing per project using `TASK_COUNTERS` map (e.g., WSP-1, WSP-2, MOB-1).
 - **Filtering:** Client-side for both projects and tasks (low data volume). Server-side pagination deferred — `PaginationMeta` type removed, will add back in Week 4 if needed.
-- **URL sync for filters:** Planned for Day 5 — swap `useState` to `useSearchParams` for filter state on Projects and Board pages.
+- **URL sync for filters:** Generic `useFilterParams` hook syncs filter state to URL search params. Accepts defaults object, omits params from URL when they match defaults. Used by ProjectsPage and MyTasksPage. No Board-level filters needed (kanban has no filter UI).
 - **Project access in handlers:** Kept as inline checks (not abstracted into middleware). `withProjectAccess` wrapper was considered but rejected — too complex for 5 handlers with varying access patterns. `withAuth` and `withRole` are the only two middleware.
 - **RTK Query tag types:** Registered per-feature via `enhanceEndpoints({ addTagTypes: ["Projects", "Tasks"] })` before `injectEndpoints`. Base API has no `tagTypes`. Every `type` field in tag objects needs `as const` inside `.map()` to prevent TypeScript widening.
 - **`taskCount` on Project:** Computed at response time by MSW handlers via `withTaskCount()` helper, not stored in fixtures.
@@ -138,7 +138,7 @@ src/
 │   │   ├── app/
 │   │   │   ├── Dashboard.tsx  # Wired
 │   │   │   └── Projects.tsx   # Wired — renders ProjectsPage
-│   │   ├── my/                # Tasks (wired)
+│   │   ├── my/                # Tasks (wired — renders MyTasksPage)
 │   │   ├── auth/              # SignIn, SignUp, ForgotPassword, ResetPassword (all functional)
 │   │   ├── shared/            # Profile, Settings, Notifications (wired)
 │   │   ├── Landing.tsx
@@ -195,12 +195,17 @@ src/
 │   │   ├── types.ts           # ProjectWithOwner, ProjectDetailResponse
 │   │   └── index.ts
 │   └── tasks/
+│       ├── components/
+│       │   ├── MyTaskCard.tsx          # Standalone task card (status dot, priority badge, date)
+│       │   ├── MyTasksPage.tsx         # My Tasks page — useFilterParams, loading/error/empty states
+│       │   └── index.ts
 │       ├── api.ts             # enhanceEndpoints + injectEndpoints, 7 endpoints (clean providesTags pattern)
 │       ├── schemas.ts         # createTaskSchema, updateTaskSchema (Zod)
 │       ├── types.ts           # CreateTaskInput, UpdateTaskInput, ReorderTasksRequest/Response
 │       └── index.ts
 │
 ├── hooks/
+│   ├── use-filter-params.ts   # Generic URL-synced filter state hook
 │   ├── use-mobile.ts
 │   └── use-permission.ts
 │
@@ -264,7 +269,7 @@ src/
 
 ## Last Working Point
 
-Completed **Week 2, Day 4** — Project detail page and kanban board fully functional.
+Completed **Week 2** — Projects, tasks, kanban, and My Tasks all functional.
 
 ### What's built:
 
@@ -272,21 +277,22 @@ Completed **Week 2, Day 4** — Project detail page and kanban board fully funct
 - **Week 2 Day 1:** Constants, entity types, fixtures, MSW handlers (12 endpoints), RTK Query APIs, Zod schemas
 - **Week 2 Day 2:** Projects list page — filter tabs (shadcn Button), search (InputGroup), project cards (vertical layout), create project sheet, color picker, empty states, skeletons. Route wired at `/app/projects`.
 - **Week 2 Day 3-4:** Project detail page with breadcrumb navigation, header (name, key, status, description, dates), always-visible overview (Members + Task stats cards), Board/Sprints tabs. Kanban board with dnd-kit drag-and-drop, optimistic reorder with cache invalidation. Unified TaskSheet (create/edit via discriminated union props, delete with confirmation). CRUD permissions (PROJECTS_CREATE, TASKS_CREATE) gating create actions. Reusable utilities: PageBreadcrumb, formatDate, getInitials. Hardened MSW task handler with field whitelisting. Refactored RTK Query providesTags to clean named-variable pattern.
+- **Week 2 Day 5:** Generic `useFilterParams` hook (URL-synced filter state). ProjectsPage migrated to `useFilterParams`. Query error state added to ProjectsPage, toast on KanbanBoard drag failure. My Tasks page (`/my/tasks`) — `useGetMyTasksQuery` with status/search filters, MyTaskCard component (status dot, priority badge with color, date), loading skeletons, error/empty/no-results states.
 
 ---
 
 ## Next Steps & Open Questions
 
-### Next: Week 2, Day 5 — Polish
+### Next: Week 3 — Sprint planning, time tracker, member experience
 
-- `useSearchParams` for filter state (Projects + Board)
-- Edge cases, error states
-- Wire remaining routes (My Tasks page)
-- Review and clean up any rough edges
+- Sprint planning UI and data model
+- Time tracker for members
+- Member management within projects
 
 ### Open Questions
 
 - Member management — inline chip selector or separate view?
-- Sprint planning UI approach (Week 3)
+- Sprint planning UI approach — timeline, list, or board?
+- Time tracker — simple start/stop or detailed entry form?
 
 ---
