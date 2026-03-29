@@ -6,7 +6,13 @@ import { PROJECT_COLORS, PROJECT_STATUS, ROLES } from "@/constants";
 
 import type { MockProject } from "../fixtures/projects";
 
-import { sanitizeUser, withAuth, withRole } from "../utils/auth";
+import {
+  canAccessProject,
+  isProjectOwner,
+  sanitizeUser,
+  withAuth,
+  withRole,
+} from "../utils/auth";
 import { PROJECTS_BASE_URL } from "../utils/constants";
 import { delay } from "../utils/delay";
 import {
@@ -30,18 +36,6 @@ function withTaskCount(project: MockProject): Project {
   };
 }
 
-function canAccessProject(userId: string, role: string, project: MockProject): boolean {
-  if (role === ROLES.ADMIN)
-    return true;
-  return project.ownerId === userId || project.memberIds.includes(userId);
-}
-
-function isProjectOwner(userId: string, role: string, project: MockProject): boolean {
-  if (role === ROLES.ADMIN)
-    return true;
-  return project.ownerId === userId;
-}
-
 /* =========================================================
    Handlers
 ========================================================= */
@@ -54,7 +48,7 @@ const listProjects = http.get(
 
     const projects = mswStore.getProjects();
 
-    const accessibleProjects = projects.filter(p => canAccessProject(user.id, user.role, p));
+    const accessibleProjects = projects.filter(p => canAccessProject(user.id, user.role, p.id));
 
     const data = accessibleProjects
       .map(withTaskCount)
@@ -87,7 +81,7 @@ const getProject = http.get(
       });
     }
 
-    if (!canAccessProject(user.id, user.role, project)) {
+    if (!canAccessProject(user.id, user.role, project.id)) {
       return errorResponse({
         code: ERROR_CODES.FORBIDDEN,
         message: ERROR_MESSAGES.FORBIDDEN,
@@ -182,7 +176,7 @@ const updateProject = http.patch(
       });
     }
 
-    if (!isProjectOwner(user.id, user.role, project)) {
+    if (!isProjectOwner(user.id, user.role, project.id)) {
       return errorResponse({
         code: ERROR_CODES.FORBIDDEN,
         message: ERROR_MESSAGES.FORBIDDEN,
@@ -240,7 +234,7 @@ const deleteProject = http.delete(
       });
     }
 
-    if (!isProjectOwner(user.id, user.role, project)) {
+    if (!isProjectOwner(user.id, user.role, project.id)) {
       return errorResponse({
         code: ERROR_CODES.FORBIDDEN,
         message: ERROR_MESSAGES.FORBIDDEN,

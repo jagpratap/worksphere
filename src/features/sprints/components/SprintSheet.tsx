@@ -4,8 +4,7 @@ import { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
 
-import type { CreateTaskFormValues } from "@/features/tasks";
-import type { SafeUser, Task } from "@/types";
+import type { CreateSprintFormValues, SprintWithStats } from "@/features/sprints";
 
 import {
   AlertDialog,
@@ -44,102 +43,92 @@ import {
 } from "@/components/ui/sheet";
 import { Textarea } from "@/components/ui/textarea";
 import {
-  DEFAULT_TASK_PRIORITY,
-  DEFAULT_TASK_STATUS,
-  TASK_PRIORITY,
-  TASK_PRIORITY_LABELS,
-  TASK_STATUS,
-  TASK_STATUS_LABELS,
+  DEFAULT_SPRINT_STATUS,
+  SPRINT_STATUS,
+  SPRINT_STATUS_LABELS,
 } from "@/constants";
-import { useGetSprintsByProjectQuery } from "@/features/sprints";
 import {
-  createTaskSchema,
-  useCreateTaskMutation,
-  useDeleteTaskMutation,
-  useUpdateTaskMutation,
-} from "@/features/tasks";
+  createSprintSchema,
+  useCreateSprintMutation,
+  useDeleteSprintMutation,
+  useUpdateSprintMutation,
+} from "@/features/sprints";
 import { parseApiError } from "@/utils/error";
 
 type CreateMode = {
   projectId: string;
-  members: SafeUser[];
 };
 
 type EditMode = {
-  task: Task | null;
-  members: SafeUser[];
+  sprint: SprintWithStats | null;
   projectId: string;
   onClose: () => void;
 };
 
-type TaskSheetProps = CreateMode | EditMode;
+type SprintSheetProps = CreateMode | EditMode;
 
-function isEditMode(props: TaskSheetProps): props is EditMode {
-  return "task" in props;
+function isEditMode(props: SprintSheetProps): props is EditMode {
+  return "sprint" in props;
 }
 
-export function TaskSheet(props: TaskSheetProps) {
+export function SprintSheet(props: SprintSheetProps) {
   const editing = isEditMode(props);
-  const task = editing ? props.task : null;
+  const sprint = editing ? props.sprint : null;
 
-  const [createTask, { isLoading: isCreating }] = useCreateTaskMutation();
-  const [updateTask, { isLoading: isUpdating }] = useUpdateTaskMutation();
-  const [deleteTask, { isLoading: isDeleting }] = useDeleteTaskMutation();
+  const [createSprint, { isLoading: isCreating }] = useCreateSprintMutation();
+  const [updateSprint, { isLoading: isUpdating }] = useUpdateSprintMutation();
+  const [deleteSprint, { isLoading: isDeleting }] = useDeleteSprintMutation();
 
   const {
     control,
     setError,
     handleSubmit,
     reset,
-  } = useForm<CreateTaskFormValues>({
-    resolver: zodResolver(createTaskSchema),
+  } = useForm<CreateSprintFormValues>({
+    resolver: zodResolver(createSprintSchema),
     defaultValues: {
-      title: "",
-      description: "",
-      status: DEFAULT_TASK_STATUS,
-      priority: DEFAULT_TASK_PRIORITY,
-      assigneeId: null,
-      sprintId: null,
+      name: "",
+      goal: "",
+      status: DEFAULT_SPRINT_STATUS,
+      startDate: "",
+      endDate: "",
     },
   });
 
-  const { data: sprints } = useGetSprintsByProjectQuery(props.projectId);
-
   const [createOpen, setCreateOpen] = useState(false);
 
-  // Sync form when editing an existing task
+  // Sync form when editing an existing sprint
   useEffect(() => {
-    if (task) {
+    if (sprint) {
       reset({
-        title: task.title,
-        description: task.description,
-        status: task.status,
-        priority: task.priority,
-        assigneeId: task.assigneeId,
-        sprintId: task.sprintId,
+        name: sprint.name,
+        goal: sprint.goal,
+        status: sprint.status,
+        startDate: sprint.startDate,
+        endDate: sprint.endDate,
       });
     }
-  }, [task, reset]);
+  }, [sprint, reset]);
 
-  const onSubmit = async (values: CreateTaskFormValues) => {
+  const onSubmit = async (values: CreateSprintFormValues) => {
     try {
-      if (editing && task) {
-        const { message } = await updateTask({ id: task.id, ...values }).unwrap();
+      if (editing && sprint) {
+        const { message } = await updateSprint({ id: sprint.id, ...values }).unwrap();
         toast.success(message);
         props.onClose();
       }
       else {
-        const { message } = await createTask({ ...values, projectId: props.projectId }).unwrap();
+        const { message } = await createSprint({ ...values, projectId: props.projectId }).unwrap();
         toast.success(message);
         setCreateOpen(false);
         reset();
       }
     }
     catch (err) {
-      const { message, fieldErrors } = parseApiError<CreateTaskFormValues>(err);
+      const { message, fieldErrors } = parseApiError<CreateSprintFormValues>(err);
 
       Object.entries(fieldErrors).forEach(([field, msg]) => {
-        setError(field as keyof CreateTaskFormValues, {
+        setError(field as keyof CreateSprintFormValues, {
           type: "server",
           message: msg,
         });
@@ -152,11 +141,11 @@ export function TaskSheet(props: TaskSheetProps) {
   };
 
   const handleDelete = async () => {
-    if (!editing || !task)
+    if (!editing || !sprint)
       return;
 
     try {
-      const { message } = await deleteTask({ id: task.id, projectId: props.projectId }).unwrap();
+      const { message } = await deleteSprint({ id: sprint.id }).unwrap();
       toast.success(message);
       props.onClose();
     }
@@ -178,9 +167,9 @@ export function TaskSheet(props: TaskSheetProps) {
     }
   };
 
-  const isOpen = editing ? !!task : createOpen;
+  const isOpen = editing ? !!sprint : createOpen;
   const isSubmitting = editing ? isUpdating : isCreating;
-  const formId = editing ? "edit-task-form" : "create-task-form";
+  const formId = editing ? "edit-sprint-form" : "create-sprint-form";
 
   return (
     <Sheet open={isOpen} onOpenChange={handleOpenChange}>
@@ -188,16 +177,18 @@ export function TaskSheet(props: TaskSheetProps) {
         <SheetTrigger asChild>
           <Button size="sm">
             <Plus className="size-4" />
-            New Task
+            New Sprint
           </Button>
         </SheetTrigger>
       )}
 
       <SheetContent>
         <SheetHeader>
-          <SheetTitle className="text-lg font-semibold">{editing ? task?.key : "Create Task"}</SheetTitle>
+          <SheetTitle className="text-lg font-semibold">
+            {editing ? "Edit Sprint" : "Create Sprint"}
+          </SheetTitle>
           <SheetDescription>
-            {editing ? "Edit task details or delete it." : "Add a new task to this project."}
+            {editing ? "Edit sprint details or delete it." : "Add a new sprint to this project."}
           </SheetDescription>
         </SheetHeader>
 
@@ -207,17 +198,17 @@ export function TaskSheet(props: TaskSheetProps) {
           className="flex-1 overflow-y-auto px-4"
         >
           <FieldGroup>
-            {/* Title */}
+            {/* Name */}
             <Controller
-              name="title"
+              name="name"
               control={control}
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor={field.name}>Title</FieldLabel>
+                  <FieldLabel htmlFor={field.name}>Name</FieldLabel>
                   <Input
                     {...field}
                     id={field.name}
-                    placeholder={!editing ? "e.g. Implement login flow" : undefined}
+                    placeholder={!editing ? "e.g. Sprint 1" : undefined}
                     aria-invalid={fieldState.invalid}
                   />
                   {fieldState.invalid && (
@@ -227,18 +218,18 @@ export function TaskSheet(props: TaskSheetProps) {
               )}
             />
 
-            {/* Description */}
+            {/* Goal */}
             <Controller
-              name="description"
+              name="goal"
               control={control}
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor={field.name}>Description</FieldLabel>
+                  <FieldLabel htmlFor={field.name}>Goal</FieldLabel>
                   <Textarea
                     {...field}
                     id={field.name}
-                    placeholder={!editing ? "Describe the task..." : undefined}
-                    rows={editing ? 4 : 3}
+                    placeholder={!editing ? "What should this sprint achieve?" : undefined}
+                    rows={3}
                     aria-invalid={fieldState.invalid}
                   />
                   {fieldState.invalid && (
@@ -260,9 +251,9 @@ export function TaskSheet(props: TaskSheetProps) {
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      {Object.values(TASK_STATUS).map(status => (
+                      {Object.values(SPRINT_STATUS).map(status => (
                         <SelectItem key={status} value={status}>
-                          {TASK_STATUS_LABELS[status]}
+                          {SPRINT_STATUS_LABELS[status]}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -274,25 +265,19 @@ export function TaskSheet(props: TaskSheetProps) {
               )}
             />
 
-            {/* Priority */}
+            {/* Start Date */}
             <Controller
-              name="priority"
+              name="startDate"
               control={control}
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor={field.name}>Priority</FieldLabel>
-                  <Select value={field.value} onValueChange={field.onChange}>
-                    <SelectTrigger id={field.name} className="w-full">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {Object.values(TASK_PRIORITY).map(priority => (
-                        <SelectItem key={priority} value={priority}>
-                          {TASK_PRIORITY_LABELS[priority]}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <FieldLabel htmlFor={field.name}>Start Date</FieldLabel>
+                  <Input
+                    {...field}
+                    id={field.name}
+                    type="date"
+                    aria-invalid={fieldState.invalid}
+                  />
                   {fieldState.invalid && (
                     <FieldError errors={[fieldState.error]} />
                   )}
@@ -300,56 +285,22 @@ export function TaskSheet(props: TaskSheetProps) {
               )}
             />
 
-            {/* Assignee */}
+            {/* End Date */}
             <Controller
-              name="assigneeId"
+              name="endDate"
               control={control}
-              render={({ field }) => (
-                <Field>
-                  <FieldLabel htmlFor={field.name}>Assignee</FieldLabel>
-                  <Select
-                    value={field.value ?? "unassigned"}
-                    onValueChange={v => field.onChange(v === "unassigned" ? null : v)}
-                  >
-                    <SelectTrigger id={field.name} className="w-full">
-                      <SelectValue placeholder="Unassigned" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="unassigned">Unassigned</SelectItem>
-                      {props.members.map(member => (
-                        <SelectItem key={member.id} value={member.id}>
-                          {member.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </Field>
-              )}
-            />
-
-            {/* Sprint */}
-            <Controller
-              name="sprintId"
-              control={control}
-              render={({ field }) => (
-                <Field>
-                  <FieldLabel htmlFor={field.name}>Sprint</FieldLabel>
-                  <Select
-                    value={field.value ?? "backlog"}
-                    onValueChange={v => field.onChange(v === "backlog" ? null : v)}
-                  >
-                    <SelectTrigger id={field.name} className="w-full">
-                      <SelectValue placeholder="Backlog" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="backlog">Backlog</SelectItem>
-                      {sprints?.map(sprint => (
-                        <SelectItem key={sprint.id} value={sprint.id}>
-                          {sprint.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <FieldLabel htmlFor={field.name}>End Date</FieldLabel>
+                  <Input
+                    {...field}
+                    id={field.name}
+                    type="date"
+                    aria-invalid={fieldState.invalid}
+                  />
+                  {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]} />
+                  )}
                 </Field>
               )}
             />
@@ -367,12 +318,13 @@ export function TaskSheet(props: TaskSheetProps) {
               </AlertDialogTrigger>
               <AlertDialogContent>
                 <AlertDialogHeader>
-                  <AlertDialogTitle>Delete task?</AlertDialogTitle>
+                  <AlertDialogTitle>Delete sprint?</AlertDialogTitle>
                   <AlertDialogDescription>
                     This will permanently delete
                     {" "}
-                    <strong>{task?.key}</strong>
-                    . This action cannot be undone.
+                    <strong>{sprint?.name}</strong>
+                    {" "}
+                    and unassign all tasks from it. This action cannot be undone.
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
@@ -392,7 +344,7 @@ export function TaskSheet(props: TaskSheetProps) {
           >
             {editing
               ? (isSubmitting ? "Saving..." : "Save Changes")
-              : (isSubmitting ? "Creating..." : "Create Task")}
+              : (isSubmitting ? "Creating..." : "Create Sprint")}
           </Button>
         </SheetFooter>
       </SheetContent>

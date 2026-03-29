@@ -1,16 +1,15 @@
 import { useMemo } from "react";
 
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import {
   TASK_STATUS_COLUMN_COLORS,
   TASK_STATUS_LABELS,
   TASK_STATUS_ORDER,
 } from "@/constants";
-import { getInitials } from "@/utils/string";
 
 import type { ProjectDetailResponse } from "../types";
+
+import { MemberManager } from "./MemberManager";
 
 type OverviewTabProps = {
   project: ProjectDetailResponse;
@@ -33,39 +32,7 @@ export function OverviewTab({ project }: OverviewTabProps) {
       {/* Members */}
       <Card className="gap-3 p-4">
         <h3 className="text-sm font-medium">Members</h3>
-
-        <div className="space-y-2">
-          {/* Owner */}
-          <div className="flex items-center gap-2">
-            <Avatar className="size-7">
-              <AvatarImage src={project.owner.avatar} alt={project.owner.name} />
-              <AvatarFallback className="text-xs">
-                {getInitials(project.owner.name)}
-              </AvatarFallback>
-            </Avatar>
-            <div className="min-w-0 flex-1">
-              <span className="text-sm">{project.owner.name}</span>
-            </div>
-            <Badge variant="outline" className="text-[10px]">Owner</Badge>
-          </div>
-
-          {/* Members */}
-          {project.members.map(member => (
-            <div key={member.id} className="flex items-center gap-2">
-              <Avatar className="size-7">
-                <AvatarImage src={member.avatar} alt={member.name} />
-                <AvatarFallback className="text-xs">
-                  {getInitials(member.name)}
-                </AvatarFallback>
-              </Avatar>
-              <span className="truncate text-sm">{member.name}</span>
-            </div>
-          ))}
-
-          {project.members.length === 0 && (
-            <p className="text-xs text-muted-foreground">No members assigned</p>
-          )}
-        </div>
+        <MemberManager project={project} />
       </Card>
 
       {/* Task Stats */}

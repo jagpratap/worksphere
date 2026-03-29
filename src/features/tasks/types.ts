@@ -9,6 +9,7 @@ export type CreateTaskInput = {
   status?: TaskStatus;
   priority?: TaskPriority;
   assigneeId?: string | null;
+  sprintId?: string | null;
 };
 
 export type UpdateTaskInput = Partial<Omit<CreateTaskInput, "projectId">>;

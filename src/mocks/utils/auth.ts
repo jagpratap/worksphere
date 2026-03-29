@@ -2,7 +2,7 @@ import type { PathParams } from "msw";
 
 import type { Role } from "@/constants";
 
-import { USER_STATUS } from "@/constants";
+import { ROLES, USER_STATUS } from "@/constants";
 
 import type { MockUser } from "../fixtures/users";
 import type { JWTPayload } from "./jwt";
@@ -89,4 +89,24 @@ export function withRole(roles: Role[], handler: ProtectedHandler) {
 export function sanitizeUser(user: MockUser) {
   const { password: _, ...rest } = user;
   return rest;
+}
+
+// ── Project access helpers ─────────────────────────────────────────────────
+
+export function canAccessProject(userId: string, role: string, projectId: string): boolean {
+  if (role === ROLES.ADMIN)
+    return true;
+  const project = mswStore.findProjectById(projectId);
+  if (!project)
+    return false;
+  return project.ownerId === userId || project.memberIds.includes(userId);
+}
+
+export function isProjectOwner(userId: string, role: string, projectId: string): boolean {
+  if (role === ROLES.ADMIN)
+    return true;
+  const project = mswStore.findProjectById(projectId);
+  if (!project)
+    return false;
+  return project.ownerId === userId;
 }

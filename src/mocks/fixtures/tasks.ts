@@ -15,6 +15,7 @@ export const FIXTURE_TASKS: MockTask[] = [
     status: TASK_STATUS.DONE,
     priority: TASK_PRIORITY.MEDIUM,
     assigneeId: "usr_005", // Carol
+    sprintId: "sprint_001",
     order: 0,
     createdAt: "2024-06-02T09:00:00.000Z",
     updatedAt: "2024-06-10T17:00:00.000Z",
@@ -28,6 +29,7 @@ export const FIXTURE_TASKS: MockTask[] = [
     status: TASK_STATUS.DONE,
     priority: TASK_PRIORITY.HIGH,
     assigneeId: "usr_006", // Frank
+    sprintId: "sprint_001",
     order: 1,
     createdAt: "2024-06-03T10:00:00.000Z",
     updatedAt: "2024-06-15T12:00:00.000Z",
@@ -41,6 +43,7 @@ export const FIXTURE_TASKS: MockTask[] = [
     status: TASK_STATUS.IN_REVIEW,
     priority: TASK_PRIORITY.HIGH,
     assigneeId: "usr_005", // Carol
+    sprintId: "sprint_002",
     order: 0,
     createdAt: "2024-06-05T08:00:00.000Z",
     updatedAt: "2025-03-10T09:00:00.000Z",
@@ -54,6 +57,7 @@ export const FIXTURE_TASKS: MockTask[] = [
     status: TASK_STATUS.IN_PROGRESS,
     priority: TASK_PRIORITY.MEDIUM,
     assigneeId: "usr_007", // Grace
+    sprintId: "sprint_002",
     order: 0,
     createdAt: "2024-06-08T11:00:00.000Z",
     updatedAt: "2025-03-09T14:30:00.000Z",
@@ -67,6 +71,7 @@ export const FIXTURE_TASKS: MockTask[] = [
     status: TASK_STATUS.TODO,
     priority: TASK_PRIORITY.HIGH,
     assigneeId: "usr_006", // Frank
+    sprintId: "sprint_002",
     order: 0,
     createdAt: "2024-06-10T09:00:00.000Z",
     updatedAt: "2024-06-10T09:00:00.000Z",
@@ -80,6 +85,7 @@ export const FIXTURE_TASKS: MockTask[] = [
     status: TASK_STATUS.TODO,
     priority: TASK_PRIORITY.LOW,
     assigneeId: null,
+    sprintId: null,
     order: 1,
     createdAt: "2024-06-12T10:00:00.000Z",
     updatedAt: "2024-06-12T10:00:00.000Z",
@@ -95,6 +101,7 @@ export const FIXTURE_TASKS: MockTask[] = [
     status: TASK_STATUS.DONE,
     priority: TASK_PRIORITY.MEDIUM,
     assigneeId: "usr_009", // Isla
+    sprintId: "sprint_003",
     order: 0,
     createdAt: "2024-07-16T09:00:00.000Z",
     updatedAt: "2024-08-01T15:00:00.000Z",
@@ -108,6 +115,7 @@ export const FIXTURE_TASKS: MockTask[] = [
     status: TASK_STATUS.IN_PROGRESS,
     priority: TASK_PRIORITY.HIGH,
     assigneeId: "usr_006", // Frank
+    sprintId: "sprint_003",
     order: 0,
     createdAt: "2024-08-05T10:00:00.000Z",
     updatedAt: "2025-03-08T14:30:00.000Z",
@@ -121,6 +129,7 @@ export const FIXTURE_TASKS: MockTask[] = [
     status: TASK_STATUS.TODO,
     priority: TASK_PRIORITY.MEDIUM,
     assigneeId: "usr_010", // James
+    sprintId: null,
     order: 0,
     createdAt: "2024-08-10T11:00:00.000Z",
     updatedAt: "2024-08-10T11:00:00.000Z",
@@ -134,6 +143,7 @@ export const FIXTURE_TASKS: MockTask[] = [
     status: TASK_STATUS.TODO,
     priority: TASK_PRIORITY.HIGH,
     assigneeId: "usr_009", // Isla
+    sprintId: null,
     order: 1,
     createdAt: "2024-08-12T09:00:00.000Z",
     updatedAt: "2024-08-12T09:00:00.000Z",
@@ -147,6 +157,7 @@ export const FIXTURE_TASKS: MockTask[] = [
     status: TASK_STATUS.TODO,
     priority: TASK_PRIORITY.LOW,
     assigneeId: null,
+    sprintId: null,
     order: 2,
     createdAt: "2024-08-15T14:00:00.000Z",
     updatedAt: "2024-08-15T14:00:00.000Z",
@@ -162,6 +173,7 @@ export const FIXTURE_TASKS: MockTask[] = [
     status: TASK_STATUS.IN_REVIEW,
     priority: TASK_PRIORITY.MEDIUM,
     assigneeId: "usr_007", // Grace
+    sprintId: null,
     order: 0,
     createdAt: "2025-01-12T09:00:00.000Z",
     updatedAt: "2025-03-12T11:00:00.000Z",
@@ -175,6 +187,7 @@ export const FIXTURE_TASKS: MockTask[] = [
     status: TASK_STATUS.IN_PROGRESS,
     priority: TASK_PRIORITY.HIGH,
     assigneeId: "usr_012", // Leo
+    sprintId: null,
     order: 0,
     createdAt: "2025-01-15T10:00:00.000Z",
     updatedAt: "2025-03-11T16:00:00.000Z",
@@ -188,6 +201,7 @@ export const FIXTURE_TASKS: MockTask[] = [
     status: TASK_STATUS.TODO,
     priority: TASK_PRIORITY.MEDIUM,
     assigneeId: "usr_007", // Grace
+    sprintId: null,
     order: 0,
     createdAt: "2025-01-18T11:00:00.000Z",
     updatedAt: "2025-01-18T11:00:00.000Z",
@@ -201,6 +215,7 @@ export const FIXTURE_TASKS: MockTask[] = [
     status: TASK_STATUS.TODO,
     priority: TASK_PRIORITY.LOW,
     assigneeId: "usr_012", // Leo
+    sprintId: null,
     order: 1,
     createdAt: "2025-01-20T09:00:00.000Z",
     updatedAt: "2025-01-20T09:00:00.000Z",
@@ -216,6 +231,7 @@ export const FIXTURE_TASKS: MockTask[] = [
     status: TASK_STATUS.IN_PROGRESS,
     priority: TASK_PRIORITY.URGENT,
     assigneeId: "usr_005", // Carol
+    sprintId: null,
     order: 0,
     createdAt: "2024-09-22T08:00:00.000Z",
     updatedAt: "2025-03-14T16:00:00.000Z",
@@ -229,6 +245,7 @@ export const FIXTURE_TASKS: MockTask[] = [
     status: TASK_STATUS.TODO,
     priority: TASK_PRIORITY.HIGH,
     assigneeId: "usr_010", // James
+    sprintId: null,
     order: 0,
     createdAt: "2024-09-25T10:00:00.000Z",
     updatedAt: "2024-09-25T10:00:00.000Z",
@@ -242,6 +259,7 @@ export const FIXTURE_TASKS: MockTask[] = [
     status: TASK_STATUS.TODO,
     priority: TASK_PRIORITY.MEDIUM,
     assigneeId: null,
+    sprintId: null,
     order: 1,
     createdAt: "2024-10-01T09:00:00.000Z",
     updatedAt: "2024-10-01T09:00:00.000Z",
@@ -255,6 +273,7 @@ export const FIXTURE_TASKS: MockTask[] = [
     status: TASK_STATUS.IN_REVIEW,
     priority: TASK_PRIORITY.LOW,
     assigneeId: "usr_005", // Carol
+    sprintId: null,
     order: 0,
     createdAt: "2024-10-05T11:00:00.000Z",
     updatedAt: "2025-03-13T10:00:00.000Z",

@@ -1,10 +1,10 @@
 import { http } from "msw";
 
-import { ROLES, TASK_PRIORITY, TASK_STATUS } from "@/constants";
+import { TASK_PRIORITY, TASK_STATUS } from "@/constants";
 
 import type { MockTask } from "../fixtures/tasks";
 
-import { withAuth } from "../utils/auth";
+import { canAccessProject, isProjectOwner, withAuth } from "../utils/auth";
 import { PROJECTS_BASE_URL, TASKS_BASE_URL } from "../utils/constants";
 import { delay } from "../utils/delay";
 import {
@@ -16,28 +16,6 @@ import {
   successResponse,
 } from "../utils/responses";
 import { mswStore } from "../utils/store-persistence";
-
-/* =========================================================
-   Helpers
-========================================================= */
-
-function canAccessProject(userId: string, role: string, projectId: string): boolean {
-  if (role === ROLES.ADMIN)
-    return true;
-  const project = mswStore.findProjectById(projectId);
-  if (!project)
-    return false;
-  return project.ownerId === userId || project.memberIds.includes(userId);
-}
-
-function isProjectOwner(userId: string, role: string, projectId: string): boolean {
-  if (role === ROLES.ADMIN)
-    return true;
-  const project = mswStore.findProjectById(projectId);
-  if (!project)
-    return false;
-  return project.ownerId === userId;
-}
 
 /* =========================================================
    Handlers
@@ -131,7 +109,7 @@ const createTask = http.post(
     await delay();
 
     const body = await request.json() as Record<string, unknown>;
-    const { projectId, title, description, status, priority, assigneeId } = body;
+    const { projectId, title, description, status, priority, assigneeId, sprintId } = body;
 
     if (!projectId || !title) {
       return errorResponse({
@@ -179,6 +157,7 @@ const createTask = http.post(
       priority: (priority as MockTask["priority"]) ?? TASK_PRIORITY.MEDIUM,
       assigneeId: (assigneeId as string) ?? null,
       order: siblingCount,
+      sprintId: (sprintId as string) ?? null,
       createdAt: now,
       updatedAt: now,
     };
@@ -261,6 +240,8 @@ const updateTask = http.patch(
       allowed.priority = body.priority as MockTask["priority"];
     if ("assigneeId" in body)
       allowed.assigneeId = (body.assigneeId as string) ?? null;
+    if ("sprintId" in body)
+      allowed.sprintId = (body.sprintId as string) ?? null;
     if ("order" in body)
       allowed.order = body.order as number;
 

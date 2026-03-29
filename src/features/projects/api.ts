@@ -1,4 +1,4 @@
-import type { ApiSuccessResponse, Project } from "@/types";
+import type { ApiSuccessResponse, Project, SafeUser } from "@/types";
 
 import { baseApi } from "@/store/base-api";
 
@@ -69,6 +69,12 @@ const projectsApi = baseApi
         }),
         invalidatesTags: [{ type: "Projects", id: "LIST" }],
       }),
+
+      // ── GET /api/users ───────────────────────────────────────────────────
+      getUsers: builder.query<SafeUser[], void>({
+        query: () => "/users",
+        transformResponse: (res: ApiSuccessResponse<SafeUser[]>) => res.data,
+      }),
     }),
   });
 
@@ -78,4 +84,5 @@ export const {
   useCreateProjectMutation,
   useUpdateProjectMutation,
   useDeleteProjectMutation,
+  useGetUsersQuery,
 } = projectsApi;

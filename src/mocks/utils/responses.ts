@@ -68,6 +68,13 @@ export const ERROR_MESSAGES = {
 
   // Task
   TASK_NOT_FOUND: "Task not found",
+
+  // Sprint
+  SPRINT_NOT_FOUND: "Sprint not found",
+  ACTIVE_SPRINT_EXISTS: "Only one active sprint is allowed per project",
+
+  // Time entry
+  TIME_ENTRY_NOT_FOUND: "Time entry not found",
 } as const;
 
 // ── Common Success Messages ───────────────────────────────────────────────────
@@ -95,6 +102,18 @@ export const SUCCESS_MESSAGES = {
   TASK_UPDATED: "Task updated successfully",
   TASK_DELETED: "Task deleted successfully",
   TASKS_REORDERED: "Tasks reordered successfully",
+
+  // Sprint
+  SPRINTS_FETCHED: "Sprints fetched successfully",
+  SPRINT_CREATED: "Sprint created successfully",
+  SPRINT_UPDATED: "Sprint updated successfully",
+  SPRINT_DELETED: "Sprint deleted successfully",
+
+  // Time entry
+  TIME_ENTRIES_FETCHED: "Time entries fetched successfully",
+  TIME_ENTRY_CREATED: "Time entry created successfully",
+  TIME_ENTRY_UPDATED: "Time entry updated successfully",
+  TIME_ENTRY_DELETED: "Time entry deleted successfully",
 } as const;
 
 // ── Response Types ──────────────────────────────────────────────────────────

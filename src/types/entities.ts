@@ -1,4 +1,12 @@
-import type { ProjectColor, ProjectStatus, Role, TaskPriority, TaskStatus, UserStatus } from "@/constants";
+import type {
+  ProjectColor,
+  ProjectStatus,
+  Role,
+  SprintStatus,
+  TaskPriority,
+  TaskStatus,
+  UserStatus,
+} from "@/constants";
 
 // ─── User ───────────────────────────────────────────────────────────────────
 // Password-stripped user returned by the API.
@@ -42,7 +50,36 @@ export type Task = {
   status: TaskStatus;
   priority: TaskPriority;
   assigneeId: string | null;
+  sprintId: string | null;
   order: number;
+  createdAt: string;
+  updatedAt: string;
+};
+
+// ─── Sprint ────────────────────────────────────────────────────────────────
+
+export type Sprint = {
+  id: string;
+  projectId: string;
+  name: string;
+  goal: string;
+  status: SprintStatus;
+  startDate: string;
+  endDate: string;
+  createdAt: string;
+  updatedAt: string;
+};
+
+// ─── Time Entry ────────────────────────────────────────────────────────────
+
+export type TimeEntry = {
+  id: string;
+  taskId: string;
+  userId: string;
+  projectId: string;
+  minutes: number;
+  description: string;
+  date: string;
   createdAt: string;
   updatedAt: string;
 };

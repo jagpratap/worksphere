@@ -13,7 +13,7 @@ import type {
 } from "./types";
 
 const tasksApi = baseApi
-  .enhanceEndpoints({ addTagTypes: ["Projects", "Tasks"] })
+  .enhanceEndpoints({ addTagTypes: ["Projects", "Tasks", "Sprints"] })
   .injectEndpoints({
     endpoints: builder => ({
       // ── GET /api/projects/:id/tasks ────────────────────────────────────────
@@ -59,6 +59,7 @@ const tasksApi = baseApi
         invalidatesTags: (_result, _error, { projectId }) => [
           { type: "Tasks", id: "LIST" },
           { type: "Projects", id: projectId },
+          { type: "Sprints", id: "LIST" },
         ],
       }),
 
@@ -72,7 +73,7 @@ const tasksApi = baseApi
         invalidatesTags: (result) => {
           const item = result?.data ? { type: "Tasks" as const, id: result.data.id } : null;
 
-          return item ? [item] : [];
+          return item ? [item, { type: "Sprints", id: "LIST" }] : [];
         },
       }),
 
@@ -83,7 +84,7 @@ const tasksApi = baseApi
           method: "POST",
           body,
         }),
-        invalidatesTags: [{ type: "Tasks", id: "LIST" }],
+        invalidatesTags: [{ type: "Tasks", id: "LIST" }, { type: "Sprints", id: "LIST" }],
       }),
 
       // ── DELETE /api/tasks/:id ─────────────────────────────────────────────
@@ -96,6 +97,7 @@ const tasksApi = baseApi
           { type: "Tasks", id },
           { type: "Tasks", id: "LIST" },
           { type: "Projects", id: projectId },
+          { type: "Sprints", id: "LIST" },
         ],
       }),
     }),

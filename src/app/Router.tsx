@@ -99,6 +99,10 @@ export function Router() {
                       path: paths.app.projects.detail().path,
                       lazy: lazyRoute(() => import("./routes/app/ProjectDetail")),
                     },
+                    {
+                      path: paths.app.workload.path,
+                      lazy: lazyRoute(() => import("./routes/app/Workload")),
+                    },
                   ],
                 },
 
@@ -109,6 +113,10 @@ export function Router() {
                     {
                       path: paths.my.tasks.root.path,
                       lazy: lazyRoute(() => import("./routes/my/Tasks")),
+                    },
+                    {
+                      path: paths.my.timeTracker.path,
+                      lazy: lazyRoute(() => import("./routes/my/Time")),
                     },
                   ],
                 },

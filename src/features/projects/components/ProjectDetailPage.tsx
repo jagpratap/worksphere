@@ -20,6 +20,7 @@ import {
   PROJECT_STATUS_LABELS,
   TASK_STATUS_ORDER,
 } from "@/constants";
+import { SprintSheet, SprintsTab } from "@/features/sprints";
 import { formatDate } from "@/utils/date";
 
 import { useGetProjectQuery } from "../api";
@@ -32,6 +33,7 @@ export function ProjectDetailPage() {
   const { data: project, isLoading, isError } = useGetProjectQuery(id!, { skip: !id });
 
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
+  const [activeTab, setActiveTab] = useState("board");
 
   if (!id || isError) {
     return <Navigate to={paths.app.projects.root.path} replace />;
@@ -100,16 +102,23 @@ export function ProjectDetailPage() {
       <OverviewTab project={project} />
 
       {/* Tabs */}
-      <Tabs defaultValue="board" className="pt-6">
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="pt-6">
         <div className="flex items-center justify-between gap-4 pb-4">
           <TabsList variant="line">
             <TabsTrigger value="board">Board</TabsTrigger>
             <TabsTrigger value="sprints">Sprints</TabsTrigger>
           </TabsList>
 
-          <PermissionGate requires={PERMISSIONS.TASKS_CREATE}>
-            <TaskSheet projectId={project.id} members={allMembers} />
-          </PermissionGate>
+          {activeTab === "board" && (
+            <PermissionGate requires={PERMISSIONS.TASKS_CREATE}>
+              <TaskSheet projectId={project.id} members={allMembers} />
+            </PermissionGate>
+          )}
+          {activeTab === "sprints" && (
+            <PermissionGate requires={PERMISSIONS.SPRINTS_MANAGE}>
+              <SprintSheet projectId={project.id} />
+            </PermissionGate>
+          )}
         </div>
 
         <TabsContent value="board">
@@ -121,11 +130,7 @@ export function ProjectDetailPage() {
         </TabsContent>
 
         <TabsContent value="sprints">
-          <div className="flex h-48 items-center justify-center rounded-lg border border-dashed">
-            <p className="text-sm text-muted-foreground">
-              Sprint planning coming soon
-            </p>
-          </div>
+          <SprintsTab projectId={project.id} />
         </TabsContent>
       </Tabs>
 

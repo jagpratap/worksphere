@@ -18,6 +18,7 @@ export const createTaskSchema = z.object({
   status: z.enum(taskStatusValues),
   priority: z.enum(taskPriorityValues),
   assigneeId: z.string().nullable(),
+  sprintId: z.string().nullable(),
 });
 
 export const updateTaskSchema = createTaskSchema.partial();

@@ -1,17 +1,18 @@
 import { http } from "msw";
 
 import { DEFAULT_ROLE } from "@/config/roles";
-import { USER_STATUS } from "@/constants";
+import { ROLES, USER_STATUS } from "@/constants";
 
 import type { MockUser } from "../fixtures/users.ts";
 
-import { sanitizeUser, withAuth } from "../utils/auth.ts";
+import { sanitizeUser, withAuth, withRole } from "../utils/auth.ts";
 import {
   AUTH_BASE_URL,
   EMAIL_VERIFY_TTL_MS,
   PASSWORD_RESET_TTL_MS,
   REFRESH_ROTATE_MS,
   REFRESH_TOKEN_TTL_MS,
+  USERS_BASE_URL,
 } from "../utils/constants.ts";
 import { delay } from "../utils/delay.ts";
 import { signToken } from "../utils/jwt.ts";
@@ -440,8 +441,26 @@ const verificationStatus = http.get(
   }),
 );
 
+// ── GET /api/users ──────────────────────────────────────────────────────────
+const getUsers = http.get(
+  USERS_BASE_URL,
+  withRole([ROLES.ADMIN, ROLES.MANAGER], async () => {
+    await delay();
+
+    const users = mswStore.getUsers()
+      .filter(u => u.status === USER_STATUS.ACTIVE)
+      .map(sanitizeUser);
+
+    return successResponse({
+      data: users,
+      message: "Users fetched successfully",
+    });
+  }),
+);
+
 export const authHandlers = [
   me,
+  getUsers,
   signIn,
   signUp,
   signOut,

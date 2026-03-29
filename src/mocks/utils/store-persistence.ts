@@ -1,9 +1,13 @@
 import type { MockProject } from "../fixtures/projects";
+import type { MockSprint } from "../fixtures/sprints";
 import type { MockTask } from "../fixtures/tasks";
+import type { MockTimeEntry } from "../fixtures/time-entries";
 import type { MockUser } from "../fixtures/users";
 
 import { FIXTURE_PROJECTS } from "../fixtures/projects";
+import { FIXTURE_SPRINTS } from "../fixtures/sprints";
 import { FIXTURE_TASKS } from "../fixtures/tasks";
+import { FIXTURE_TIME_ENTRIES } from "../fixtures/time-entries";
 import { FIXTURE_USERS } from "../fixtures/users";
 
 /* =========================================================
@@ -13,6 +17,8 @@ const KEYS = {
   users: "msw:users",
   tasks: "msw:tasks",
   projects: "msw:projects",
+  sprints: "msw:sprints",
+  timeEntries: "msw:timeEntries",
   refreshTokenStore: "msw:refreshTokenStore",
   emailVerificationStore: "msw:emailVerificationStore",
   passwordResetTokenStore: "msw:passwordResetTokenStore",
@@ -204,6 +210,81 @@ export const mswStore = {
   deleteTasksByProject(projectId: string): void {
     const tasks = this.getTasks();
     writeCollection(KEYS.tasks, tasks.filter(t => t.projectId !== projectId));
+  },
+
+  // ── Sprints ─────────────────────────────────────────────────────────────
+  getSprints(): MockSprint[] {
+    return readCollection<MockSprint>(KEYS.sprints, FIXTURE_SPRINTS);
+  },
+
+  getSprintsByProject(projectId: string): MockSprint[] {
+    return this.getSprints().filter(s => s.projectId === projectId);
+  },
+
+  findSprintById(id: string): MockSprint | null {
+    return this.getSprints().find(s => s.id === id) ?? null;
+  },
+
+  addSprint(sprint: MockSprint): void {
+    const sprints = this.getSprints();
+    sprints.push(sprint);
+    writeCollection(KEYS.sprints, sprints);
+  },
+
+  updateSprint(id: string, updates: Partial<MockSprint>): void {
+    const sprints = this.getSprints();
+    const index = sprints.findIndex(s => s.id === id);
+    if (index === -1)
+      return;
+    sprints[index] = { ...sprints[index], ...updates };
+    writeCollection(KEYS.sprints, sprints);
+  },
+
+  deleteSprint(id: string): void {
+    const sprints = this.getSprints();
+    writeCollection(KEYS.sprints, sprints.filter(s => s.id !== id));
+  },
+
+  deleteSprintsByProject(projectId: string): void {
+    const sprints = this.getSprints();
+    writeCollection(KEYS.sprints, sprints.filter(s => s.projectId !== projectId));
+  },
+
+  // ── Time Entries ───────────────────────────────────────────────────────
+  getTimeEntries(): MockTimeEntry[] {
+    return readCollection<MockTimeEntry>(KEYS.timeEntries, FIXTURE_TIME_ENTRIES);
+  },
+
+  getTimeEntriesByUser(userId: string): MockTimeEntry[] {
+    return this.getTimeEntries().filter(e => e.userId === userId);
+  },
+
+  getTimeEntriesByTask(taskId: string): MockTimeEntry[] {
+    return this.getTimeEntries().filter(e => e.taskId === taskId);
+  },
+
+  findTimeEntryById(id: string): MockTimeEntry | null {
+    return this.getTimeEntries().find(e => e.id === id) ?? null;
+  },
+
+  addTimeEntry(entry: MockTimeEntry): void {
+    const entries = this.getTimeEntries();
+    entries.push(entry);
+    writeCollection(KEYS.timeEntries, entries);
+  },
+
+  updateTimeEntry(id: string, updates: Partial<MockTimeEntry>): void {
+    const entries = this.getTimeEntries();
+    const index = entries.findIndex(e => e.id === id);
+    if (index === -1)
+      return;
+    entries[index] = { ...entries[index], ...updates };
+    writeCollection(KEYS.timeEntries, entries);
+  },
+
+  deleteTimeEntry(id: string): void {
+    const entries = this.getTimeEntries();
+    writeCollection(KEYS.timeEntries, entries.filter(e => e.id !== id));
   },
 
   // ── Task Key Generation ─────────────────────────────────────────────────

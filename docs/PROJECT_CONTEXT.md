@@ -10,7 +10,7 @@ Building **WorkSphere** — a role-based project management SaaS (lightweight Ji
 
 - Week 1: Foundation & role infrastructure ✅
 - Week 2: Projects & task system (kanban) ✅
-- Week 3: Sprint planning, time tracker, member experience ← UP NEXT
+- Week 3: Sprint planning, time tracker, member experience ✅
 - Week 4: Admin features (user management, billing, audit log)
 - Week 5: Workload, notifications, polish
 - Week 6: Visual polish, performance, deploy
@@ -110,7 +110,7 @@ Building **WorkSphere** — a role-based project management SaaS (lightweight Ji
 
 ## Details, Facts & Constraints
 
-### Folder Structure (current state after Week 2 Day 4)
+### Folder Structure (current state after Week 3)
 
 ```
 src/
@@ -137,14 +137,18 @@ src/
 │   │   ├── admin/             # Dashboard (wired)
 │   │   ├── app/
 │   │   │   ├── Dashboard.tsx  # Wired
-│   │   │   └── Projects.tsx   # Wired — renders ProjectsPage
-│   │   ├── my/                # Tasks (wired — renders MyTasksPage)
+│   │   │   ├── Projects.tsx   # Wired — renders ProjectsPage
+│   │   │   ├── ProjectDetail.tsx # Wired
+│   │   │   └── Workload.tsx   # Wired — renders WorkloadPage
+│   │   ├── my/
+│   │   │   ├── Tasks.tsx      # Wired — renders MyTasksPage
+│   │   │   └── Time.tsx       # Wired — renders TimeTrackerPage
 │   │   ├── auth/              # SignIn, SignUp, ForgotPassword, ResetPassword (all functional)
 │   │   ├── shared/            # Profile, Settings, Notifications (wired)
 │   │   ├── Landing.tsx
 │   │   ├── NotFound.tsx
 │   │   └── Unauthorized.tsx
-│   ├── Router.tsx             # /app/projects wired
+│   ├── Router.tsx             # All routes wired
 │   └── index.tsx
 │
 ├── components/
@@ -168,6 +172,7 @@ src/
 │   ├── index.ts
 │   ├── project-status.ts      # PROJECT_STATUS, labels, badge variants, PROJECT_COLORS, color labels, default
 │   ├── roles.ts               # ROLES, Role, ROLE_LABELS
+│   ├── sprint-status.ts       # SPRINT_STATUS (planning/active/completed), labels, badge variants, default
 │   ├── task-priority.ts       # TASK_PRIORITY, labels, badge variants, colors, weights, default
 │   ├── task-status.ts         # TASK_STATUS, labels, badge variants, column colors, order, default
 │   └── user-status.ts
@@ -182,26 +187,55 @@ src/
 │   │   │   ├── CreateProjectSheet.tsx   # Slide-over form (RHF + Zod + RTK mutation)
 │   │   │   ├── KanbanBoard.tsx          # dnd-kit DnD with optimistic reorder
 │   │   │   ├── KanbanColumn.tsx         # Droppable column with SortableContext
-│   │   │   ├── OverviewTab.tsx          # Members + task stats cards (always visible)
+│   │   │   ├── MemberManager.tsx        # Inline add/remove members with Select
+│   │   │   ├── OverviewTab.tsx          # MemberManager + task stats cards (always visible)
 │   │   │   ├── ProjectCard.tsx          # Vertical card layout + skeleton
-│   │   │   ├── ProjectDetailPage.tsx    # Breadcrumb + header + overview + tabs
+│   │   │   ├── ProjectDetailPage.tsx    # Breadcrumb + header + overview + tabs (Board/Sprints)
 │   │   │   ├── ProjectsEmptyState.tsx   # Empty / no-results states
 │   │   │   ├── ProjectsPage.tsx         # Main page — filter tabs, search, list
 │   │   │   ├── TaskCard.tsx             # Sortable card with useSortable
-│   │   │   ├── TaskSheet.tsx            # Unified create/edit sheet (discriminated union props)
+│   │   │   ├── TaskSheet.tsx            # Unified create/edit sheet + sprintId Select
 │   │   │   └── index.ts
-│   │   ├── api.ts             # enhanceEndpoints + injectEndpoints, 5 endpoints
+│   │   ├── api.ts             # enhanceEndpoints + injectEndpoints, 6 endpoints (+ getUsers)
 │   │   ├── schemas.ts         # createProjectSchema, updateProjectSchema (Zod)
 │   │   ├── types.ts           # ProjectWithOwner, ProjectDetailResponse
 │   │   └── index.ts
-│   └── tasks/
+│   ├── sprints/
+│   │   ├── components/
+│   │   │   ├── SprintCard.tsx           # Status accent border, icons, progress bar
+│   │   │   ├── SprintSheet.tsx          # Unified create/edit sheet (discriminated union)
+│   │   │   ├── SprintsTab.tsx           # Sprint list with loading/error/empty states
+│   │   │   └── index.ts
+│   │   ├── api.ts             # 4 endpoints: getByProject, create, update, delete
+│   │   ├── schemas.ts         # createSprintSchema (with date cross-validation), updateSprintSchema
+│   │   ├── types.ts           # CreateSprintInput, UpdateSprintInput, SprintWithStats
+│   │   └── index.ts
+│   ├── tasks/
+│   │   ├── components/
+│   │   │   ├── MyTaskCard.tsx          # Standalone task card (status dot, priority badge, date)
+│   │   │   ├── MyTasksPage.tsx         # My Tasks page — useFilterParams, loading/error/empty states
+│   │   │   └── index.ts
+│   │   ├── api.ts             # 7 endpoints, cross-invalidates Sprints tag
+│   │   ├── schemas.ts         # createTaskSchema (+ sprintId), updateTaskSchema
+│   │   ├── types.ts           # CreateTaskInput (+ sprintId), UpdateTaskInput, ReorderTasks
+│   │   └── index.ts
+│   ├── time-entries/
+│   │   ├── components/
+│   │   │   ├── TimeEntryCard.tsx       # Time, task key/title, dropdown edit/delete with confirmation
+│   │   │   ├── TimeEntrySheet.tsx      # Unified create/edit sheet (task select, minutes, date)
+│   │   │   ├── TimeTrackerPage.tsx     # Summary stats, filter tabs, search, entry list
+│   │   │   └── index.ts
+│   │   ├── api.ts             # 4 endpoints: getMy, create, update, delete
+│   │   ├── schemas.ts         # createTimeEntrySchema (minutes 1-480), updateTimeEntrySchema
+│   │   ├── types.ts           # CreateTimeEntryInput, UpdateTimeEntryInput, TimeEntryWithTask
+│   │   └── index.ts
+│   └── workload/
 │       ├── components/
-│       │   ├── MyTaskCard.tsx          # Standalone task card (status dot, priority badge, date)
-│       │   ├── MyTasksPage.tsx         # My Tasks page — useFilterParams, loading/error/empty states
+│       │   ├── MemberWorkloadCard.tsx  # Avatar, task breakdown by status, multi-color progress bar
+│       │   ├── WorkloadPage.tsx        # Project filter Select, member workload grid
 │       │   └── index.ts
-│       ├── api.ts             # enhanceEndpoints + injectEndpoints, 7 endpoints (clean providesTags pattern)
-│       ├── schemas.ts         # createTaskSchema, updateTaskSchema (Zod)
-│       ├── types.ts           # CreateTaskInput, UpdateTaskInput, ReorderTasksRequest/Response
+│       ├── api.ts             # 1 endpoint: getWorkload (optional projectId filter)
+│       ├── types.ts           # MemberWorkload (user + tasksByStatus + totalTasks)
 │       └── index.ts
 │
 ├── hooks/
@@ -212,16 +246,21 @@ src/
 ├── mocks/
 │   ├── fixtures/
 │   │   ├── projects.ts        # 5 projects (3 Bob, 2 Diana), 1 archived
-│   │   ├── tasks.ts           # 19 tasks across 4 projects
+│   │   ├── sprints.ts         # 3 sprints across WSP + MOB
+│   │   ├── tasks.ts           # 19 tasks across 4 projects (with sprintId)
+│   │   ├── time-entries.ts    # 10 entries across users/tasks
 │   │   └── users.ts           # 12 users
 │   ├── handlers/
-│   │   ├── auth.ts
+│   │   ├── auth.ts            # + GET /api/users (admin/manager)
 │   │   ├── projects.ts        # CRUD with inline access checks + withTaskCount
-│   │   ├── tasks.ts           # CRUD with inline access checks
+│   │   ├── sprints.ts         # CRUD with max-1-active enforcement
+│   │   ├── tasks.ts           # CRUD with sprintId allowlist
+│   │   ├── time-entries.ts    # CRUD with owner-only guards
+│   │   ├── workload.ts        # Aggregates tasks by assignee
 │   │   └── index.ts
 │   ├── utils/
 │   │   ├── auth.ts            # withAuth, withRole, sanitizeUser (NO withProjectAccess)
-│   │   ├── constants.ts       # TTLs, AUTH_BASE_URL, PROJECTS_BASE_URL, TASKS_BASE_URL
+│   │   ├── constants.ts       # TTLs, all BASE_URLs
 │   │   ├── delay.ts
 │   │   ├── jwt.ts
 │   │   ├── responses.ts
@@ -237,11 +276,11 @@ src/
 │
 ├── types/
 │   ├── api.ts                 # ApiSuccessResponse (NO PaginationMeta), ApiErrorResponse, AuthTokens, FieldErrors<T>
-│   ├── entities.ts            # SafeUser, Project (with taskCount), Task, Create/Update inputs
+│   ├── entities.ts            # SafeUser, Project, Task (with sprintId), Sprint, TimeEntry
 │   └── index.ts
 │
 ├── utils/
-│   ├── date.ts                # formatDate() — centralized date formatting
+│   ├── date.ts                # formatDate, formatMinutes, isToday, isThisWeek
 │   ├── error.ts
 │   ├── permissions.ts
 │   ├── redirect.ts
@@ -258,18 +297,24 @@ src/
 **Auth** (10 endpoints — all functional)
 **Projects** (5 endpoints): list, get (with tasks + taskCount), create, update, delete
 **Tasks** (7 endpoints): by-project, my-tasks, get, create, update, reorder, delete
+**Sprints** (4 endpoints): get-by-project (with taskCount/completedCount), create, update (max 1 active per project), delete (unsets task sprintIds)
+**Time Entries** (4 endpoints): get-my (enriched with task key/title), create, update (owner-only), delete (owner-only)
+**Users** (1 endpoint): list active users (admin/manager only)
+**Workload** (1 endpoint): task distribution by assignee, optional projectId filter
 
 ### Fixture Data
 
 - **Users:** 12 (1 admin: Alice, 3 managers: Bob/Diana/Evan, 8 members)
 - **Projects:** 5 (WSP, MOB, DSN, AGW active; MKT archived). Bob owns WSP/DSN/MKT, Diana owns MOB/AGW.
-- **Tasks:** 19 across 4 active projects. Mixed statuses and priorities.
+- **Tasks:** 19 across 4 active projects. Mixed statuses and priorities. ~5 tasks assigned to sprints.
+- **Sprints:** 3 across WSP + MOB projects (1 completed, 1 active, 1 planning).
+- **Time Entries:** 10 entries across users/tasks with varying minutes and dates.
 
 ---
 
 ## Last Working Point
 
-Completed **Week 2** — Projects, tasks, kanban, and My Tasks all functional.
+Completed **Week 3** — Sprint planning, time tracker, workload, and member management all functional.
 
 ### What's built:
 
@@ -278,21 +323,34 @@ Completed **Week 2** — Projects, tasks, kanban, and My Tasks all functional.
 - **Week 2 Day 2:** Projects list page — filter tabs (shadcn Button), search (InputGroup), project cards (vertical layout), create project sheet, color picker, empty states, skeletons. Route wired at `/app/projects`.
 - **Week 2 Day 3-4:** Project detail page with breadcrumb navigation, header (name, key, status, description, dates), always-visible overview (Members + Task stats cards), Board/Sprints tabs. Kanban board with dnd-kit drag-and-drop, optimistic reorder with cache invalidation. Unified TaskSheet (create/edit via discriminated union props, delete with confirmation). CRUD permissions (PROJECTS_CREATE, TASKS_CREATE) gating create actions. Reusable utilities: PageBreadcrumb, formatDate, getInitials. Hardened MSW task handler with field whitelisting. Refactored RTK Query providesTags to clean named-variable pattern.
 - **Week 2 Day 5:** Generic `useFilterParams` hook (URL-synced filter state). ProjectsPage migrated to `useFilterParams`. Query error state added to ProjectsPage, toast on KanbanBoard drag failure. My Tasks page (`/my/tasks`) — `useGetMyTasksQuery` with status/search filters, MyTaskCard component (status dot, priority badge with color, date), loading skeletons, error/empty/no-results states.
+- **Week 3 Day 1-2:** Sprint + time entry data layer. Sprint/TimeEntry types on entities.ts, `sprintId` on Task. Sprint constants (status, labels, badge variants). Fixtures for sprints (3) and time entries (10). MSW store collections with full CRUD. Sprint handlers (max 1 active per project, delete unsets task sprintIds). Time entry handlers (owner-only edit/delete, enriched with task key/title). RTK Query APIs + Zod schemas for both features. `sprintId` added to task types, schemas, and handler allowlists. Cross-feature cache invalidation (task mutations invalidate Sprints tag).
+- **Week 3 Day 3:** Sprint Planning UI. SprintCard (status accent border, status icons, progress bar colored by status). SprintSheet (unified create/edit with delete confirmation). SprintsTab (list with loading/error/empty states). ProjectDetailPage updated with controlled tabs — "New Task" on Board tab, "New Sprint" on Sprints tab (gated by SPRINTS_MANAGE). TaskSheet extended with sprintId Select field (Backlog + available sprints).
+- **Week 3 Day 4:** Time Tracker page (`/my/time`). Date utils (formatMinutes, isToday, isThisWeek). TimeEntryCard (formatted time, task key/title, dropdown with edit/delete + confirmation dialog). TimeEntrySheet (task select from My Tasks, minutes input, date picker). TimeTrackerPage (summary stat cards for Today/This Week, filter tabs All/Today/Week, search, entry list). Route wired.
+- **Week 3 Day 5:** Member management — MemberManager component (inline in OverviewTab, add via Select, remove with X button, gated by SPRINTS_MANAGE). GET /api/users handler (admin/manager only). Workload page (`/app/workload`) — MemberWorkloadCard (avatar, task breakdown by status with colored dots, multi-color progress bar), WorkloadPage (project filter Select, grid layout). Route wired.
+
+### Week 3 Decisions
+
+- **Sprint UI:** List-based sprint cards (not timeline/gantt). Card has status-colored left border accent, status icon (CircleDashed/Zap/CheckCircle2), progress bar colored by status.
+- **Date input:** Native `<input type="date">` styled with existing Input component — no new dependency.
+- **Time tracker:** Manual log form (task + minutes + date + description), not start/stop timer — simpler state model.
+- **Member management:** Inline in OverviewTab using Select component for adding members. No separate view.
+- **Task → Sprint link:** `sprintId: string | null` on Task entity. null = backlog. TaskSheet has Sprint Select with "Backlog" default.
+- **Cross-feature cache invalidation:** All 4 task mutations (create, update, reorder, delete) invalidate `Sprints LIST` tag since sprint stats (taskCount/completedCount) depend on task data.
+- **Workload aggregation:** Server-side grouping by assigneeId. Sorted by totalTasks descending. Optional projectId filter via query param.
 
 ---
 
 ## Next Steps & Open Questions
 
-### Next: Week 3 — Sprint planning, time tracker, member experience
+### Next: Week 4 — Admin features (user management, billing, audit log)
 
-- Sprint planning UI and data model
-- Time tracker for members
-- Member management within projects
+- User management page (CRUD users, role assignment, activation/deactivation)
+- Billing page (placeholder/mock data)
+- Audit log page (action history)
 
 ### Open Questions
 
-- Member management — inline chip selector or separate view?
-- Sprint planning UI approach — timeline, list, or board?
-- Time tracker — simple start/stop or detailed entry form?
+- Audit log — what events to track? Just CRUD operations or also auth events?
+- Billing — static mockup or interactive mock with plan selection?
 
 ---
