@@ -9,7 +9,7 @@ Building **WorkSphere** — a role-based project management SaaS (lightweight Ji
 **6-week roadmap:**
 
 - Week 1: Foundation & role infrastructure ✅
-- Week 2: Projects & task system (kanban) ← IN PROGRESS (Day 1-2 done)
+- Week 2: Projects & task system (kanban) ← IN PROGRESS (Day 1-4 done)
 - Week 3: Sprint planning, time tracker, member experience
 - Week 4: Admin features (user management, billing, audit log)
 - Week 5: Workload, notifications, polish
@@ -49,11 +49,15 @@ Building **WorkSphere** — a role-based project management SaaS (lightweight Ji
 ### Week 2 Decisions
 
 - **Kanban DnD library:** `dnd-kit` (`@dnd-kit/core` + `@dnd-kit/sortable` + `@dnd-kit/utilities`) — more actively maintained, better TS support.
-- **Project detail layout:** Tabs (Overview / Board / Sprints) — tabbed interface within a single route.
-- **Task detail:** TBD — likely sheet/drawer overlay to keep board context visible.
+- **Project detail layout:** Breadcrumb nav + always-visible overview (Members + Tasks cards) + tabs (Board / Sprints). Overview removed from tabs to reduce nesting — project info (description, dates) moved to header.
+- **Task detail:** Unified `TaskSheet` component — handles both create and edit modes via discriminated union props. Edit mode includes delete with AlertDialog confirmation. Sheet overlay keeps board context visible.
 - **Project visibility:** Admin sees all projects; managers/members see only projects they own or belong to.
 - **Task permissions:** Admin/owner can update all fields; members/assignees can update status + order only (for drag-and-drop).
-- **Bulk reorder endpoint:** `POST /api/tasks/reorder` for drag-and-drop — accepts array of `{ id, status, order }` updates. No cache invalidation — caller handles optimistic updates.
+- **Bulk reorder endpoint:** `POST /api/tasks/reorder` for drag-and-drop — accepts array of `{ id, status, order }` updates. Invalidates `Tasks LIST` tag to sync overview stats and server data after optimistic updates.
+- **Kanban optimistic updates:** `localTasks` state holds optimistic positions during/after drag. Cleared when server data arrives via prop change (cache invalidation) or on failure (revert). No `useEffect` for cleanup — derived from `localTasks ?? tasks`.
+- **CRUD permissions:** `PROJECTS_CREATE` and `TASKS_CREATE` added alongside existing `_LIST` permissions. Admin + manager can create; members can only view. `PermissionGate` wraps create actions.
+- **Field whitelisting in updateTask handler:** Both project owners and assignees go through explicit field allowlists. No raw `...body` spread.
+- **Reusable utilities:** `PageBreadcrumb` (array-driven breadcrumb nav), `formatDate` (centralized date format), `getInitials` (first-letter initials from name words). All replace inline logic across components.
 - **Task keys:** Auto-incrementing per project using `TASK_COUNTERS` map (e.g., WSP-1, WSP-2, MOB-1).
 - **Filtering:** Client-side for both projects and tasks (low data volume). Server-side pagination deferred — `PaginationMeta` type removed, will add back in Week 4 if needed.
 - **URL sync for filters:** Planned for Day 5 — swap `useState` to `useSearchParams` for filter state on Projects and Board pages.
@@ -106,7 +110,7 @@ Building **WorkSphere** — a role-based project management SaaS (lightweight Ji
 
 ## Details, Facts & Constraints
 
-### Folder Structure (current state after Week 2 Day 2)
+### Folder Structure (current state after Week 2 Day 4)
 
 ```
 src/
@@ -147,8 +151,11 @@ src/
 │   ├── common/
 │   │   ├── ErrorFallback.tsx
 │   │   ├── FullPageSpinner.tsx
+│   │   ├── PageBreadcrumb.tsx   # Reusable breadcrumb — array of { label, path? }
+│   │   ├── PageContainer.tsx
 │   │   ├── PageHeader.tsx
-│   │   └── PermissionGate.tsx
+│   │   ├── PermissionGate.tsx
+│   │   └── index.ts
 │   └── ui/                    # shadcn/ui primitives
 │
 ├── config/
@@ -173,18 +180,24 @@ src/
 │   │   ├── components/
 │   │   │   ├── ColorPicker.tsx          # 8-color circle picker with shadcn Button + Tooltip
 │   │   │   ├── CreateProjectSheet.tsx   # Slide-over form (RHF + Zod + RTK mutation)
-│   │   │   ├── ProjectCard.tsx          # Row card + skeleton variant
+│   │   │   ├── KanbanBoard.tsx          # dnd-kit DnD with optimistic reorder
+│   │   │   ├── KanbanColumn.tsx         # Droppable column with SortableContext
+│   │   │   ├── OverviewTab.tsx          # Members + task stats cards (always visible)
+│   │   │   ├── ProjectCard.tsx          # Vertical card layout + skeleton
+│   │   │   ├── ProjectDetailPage.tsx    # Breadcrumb + header + overview + tabs
 │   │   │   ├── ProjectsEmptyState.tsx   # Empty / no-results states
 │   │   │   ├── ProjectsPage.tsx         # Main page — filter tabs, search, list
+│   │   │   ├── TaskCard.tsx             # Sortable card with useSortable
+│   │   │   ├── TaskSheet.tsx            # Unified create/edit sheet (discriminated union props)
 │   │   │   └── index.ts
 │   │   ├── api.ts             # enhanceEndpoints + injectEndpoints, 5 endpoints
 │   │   ├── schemas.ts         # createProjectSchema, updateProjectSchema (Zod)
-│   │   ├── types.ts           # Uses entity input types from types/entities.ts
+│   │   ├── types.ts           # ProjectWithOwner, ProjectDetailResponse
 │   │   └── index.ts
 │   └── tasks/
-│       ├── api.ts             # enhanceEndpoints + injectEndpoints, 7 endpoints
+│       ├── api.ts             # enhanceEndpoints + injectEndpoints, 7 endpoints (clean providesTags pattern)
 │       ├── schemas.ts         # createTaskSchema, updateTaskSchema (Zod)
-│       ├── types.ts           # Uses entity input types from types/entities.ts
+│       ├── types.ts           # CreateTaskInput, UpdateTaskInput, ReorderTasksRequest/Response
 │       └── index.ts
 │
 ├── hooks/
@@ -223,10 +236,12 @@ src/
 │   └── index.ts
 │
 ├── utils/
+│   ├── date.ts                # formatDate() — centralized date formatting
 │   ├── error.ts
 │   ├── permissions.ts
 │   ├── redirect.ts
-│   └── roles.ts               # getAllowedRolesForPath() — split from config/roles.ts
+│   ├── roles.ts               # getAllowedRolesForPath() — split from config/roles.ts
+│   └── string.ts              # getInitials() — first-letter initials from name words
 │
 ├── index.css
 ├── DESIGN_TOKENS.md
@@ -249,43 +264,29 @@ src/
 
 ## Last Working Point
 
-Completed **Week 2, Day 2** — Projects list page fully functional.
+Completed **Week 2, Day 4** — Project detail page and kanban board fully functional.
 
 ### What's built:
 
 - **Week 1:** Auth flow, role-aware sidebar, guards, all auth forms, landing page, design system
 - **Week 2 Day 1:** Constants, entity types, fixtures, MSW handlers (12 endpoints), RTK Query APIs, Zod schemas
-- **Week 2 Day 2:** Projects list page — filter tabs (shadcn Button), search (InputGroup), project cards, create project sheet, color picker, empty states, skeletons. Route wired at `/app/projects`.
+- **Week 2 Day 2:** Projects list page — filter tabs (shadcn Button), search (InputGroup), project cards (vertical layout), create project sheet, color picker, empty states, skeletons. Route wired at `/app/projects`.
+- **Week 2 Day 3-4:** Project detail page with breadcrumb navigation, header (name, key, status, description, dates), always-visible overview (Members + Task stats cards), Board/Sprints tabs. Kanban board with dnd-kit drag-and-drop, optimistic reorder with cache invalidation. Unified TaskSheet (create/edit via discriminated union props, delete with confirmation). CRUD permissions (PROJECTS_CREATE, TASKS_CREATE) gating create actions. Reusable utilities: PageBreadcrumb, formatDate, getInitials. Hardened MSW task handler with field whitelisting. Refactored RTK Query providesTags to clean named-variable pattern.
 
 ---
 
 ## Next Steps & Open Questions
 
-### Next: Week 2, Day 3 — Project Detail Page + Kanban Board Shell
-
-- Wire `/app/projects/:id` route
-- Tab layout: Overview / Board / Sprints
-- Overview tab: project info, member list, task stats
-- Board tab: Kanban columns from TASK_STATUS_ORDER
-- Tab navigation decision needed
-
-### Week 2, Day 4 — Task CRUD + Drag-and-Drop
-
-- Install `dnd-kit`
-- Draggable task cards on board
-- Optimistic reorder + `reorderTasks` mutation
-- Create task dialog, task detail sheet
-
-### Week 2, Day 5 — Polish
+### Next: Week 2, Day 5 — Polish
 
 - `useSearchParams` for filter state (Projects + Board)
 - Edge cases, error states
-- Wire remaining routes
+- Wire remaining routes (My Tasks page)
+- Review and clean up any rough edges
 
 ### Open Questions
 
-- Tab navigation — shadcn Tabs or URL search params?
-- Task detail — sheet/drawer overlay (likely)
 - Member management — inline chip selector or separate view?
+- Sprint planning UI approach (Week 3)
 
 ---
