@@ -9,6 +9,7 @@ import {
   useSensors,
 } from "@dnd-kit/core";
 import { useCallback, useMemo, useState } from "react";
+import { toast } from "sonner";
 
 import type { TaskStatus } from "@/constants";
 import type { SafeUser, Task } from "@/types";
@@ -186,8 +187,8 @@ export function KanbanBoard({ tasks, members, onTaskClick }: KanbanBoardProps) {
       await reorderTasks({ updates }).unwrap();
     }
     catch {
-      // Revert on failure
       setLocalTasks(null);
+      toast.error("Failed to move task. Changes have been reverted.");
     }
   }, [localTasks, reorderTasks, stopDrag]);
 

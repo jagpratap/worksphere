@@ -1,5 +1,5 @@
-import { Search, X } from "lucide-react";
-import { useMemo, useState } from "react";
+import { AlertCircle, Search, X } from "lucide-react";
+import { useMemo } from "react";
 
 import type { ProjectStatus } from "@/constants";
 
@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/input-group";
 import { PERMISSIONS } from "@/config/permissions";
 import { PROJECT_STATUS, PROJECT_STATUS_LABELS } from "@/constants";
+import { useFilterParams } from "@/hooks/use-filter-params";
 
 import type { ProjectWithOwner } from "../types";
 
@@ -44,11 +45,12 @@ const FILTER_TABS: { label: string; value: FilterTab }[] = [
   },
 ];
 
-export function ProjectsPage() {
-  const { data: projects, isLoading } = useGetProjectsQuery();
+const PROJECT_FILTER_DEFAULTS = { status: "all", q: "" };
 
-  const [activeTab, setActiveTab] = useState<FilterTab>("all");
-  const [search, setSearch] = useState("");
+export function ProjectsPage() {
+  const { data: projects, isLoading, isError } = useGetProjectsQuery();
+
+  const { values: filters, set: setFilter } = useFilterParams(PROJECT_FILTER_DEFAULTS);
 
   const filteredProjects = useMemo(() => {
     if (!projects)
@@ -56,12 +58,12 @@ export function ProjectsPage() {
 
     return projects.filter((project) => {
       // Tab filter
-      if (activeTab !== "all" && project.status !== activeTab)
+      if (filters.status !== "all" && project.status !== filters.status)
         return false;
 
       // Search filter
-      if (search) {
-        const q = search.toLowerCase();
+      if (filters.q) {
+        const q = filters.q.toLowerCase();
         return (
           project.name.toLowerCase().includes(q)
           || project.key.toLowerCase().includes(q)
@@ -71,7 +73,7 @@ export function ProjectsPage() {
 
       return true;
     });
-  }, [projects, activeTab, search]);
+  }, [projects, filters.status, filters.q]);
 
   return (
     <>
@@ -88,9 +90,9 @@ export function ProjectsPage() {
           {FILTER_TABS.map(tab => (
             <Button
               key={tab.value}
-              variant={activeTab === tab.value ? "secondary" : "ghost"}
+              variant={filters.status === tab.value ? "secondary" : "ghost"}
               size="sm"
-              onClick={() => setActiveTab(tab.value)}
+              onClick={() => setFilter("status", tab.value)}
             >
               {tab.label}
             </Button>
@@ -106,16 +108,16 @@ export function ProjectsPage() {
           </InputGroupAddon>
           <InputGroupInput
             placeholder="Search projects..."
-            value={search}
-            onChange={e => setSearch(e.target.value)}
+            value={filters.q}
+            onChange={e => setFilter("q", e.target.value)}
           />
-          {search && (
+          {filters.q && (
             <InputGroupAddon align="inline-end">
               <InputGroupButton
                 size="icon-xs"
                 variant="ghost"
                 aria-label="Clear search"
-                onClick={() => setSearch("")}
+                onClick={() => setFilter("q", "")}
               >
                 <X className="size-3.5" />
               </InputGroupButton>
@@ -126,7 +128,7 @@ export function ProjectsPage() {
 
       {/* Project list */}
       <div className="flex flex-col gap-2">
-        {projectListContent(isLoading, projects, filteredProjects)}
+        {projectListContent(isLoading, isError, projects, filteredProjects)}
       </div>
     </>
   );
@@ -134,11 +136,26 @@ export function ProjectsPage() {
 
 function projectListContent(
   isLoading: boolean,
+  isError: boolean,
   projects: ProjectWithOwner[] | undefined,
   filteredProjects: ProjectWithOwner[],
 ) {
   if (isLoading) {
     return Array.from({ length: 4 }, (_, i) => <ProjectCardSkeleton key={i} />);
+  }
+
+  if (isError) {
+    return (
+      <div className="flex flex-col items-center justify-center py-16 text-center">
+        <div className="flex size-12 items-center justify-center rounded-full bg-destructive/10">
+          <AlertCircle className="size-6 text-destructive" />
+        </div>
+        <h3 className="mt-4 text-sm font-medium">Failed to load projects</h3>
+        <p className="mt-1 text-sm text-muted-foreground">
+          Something went wrong. Please try refreshing the page.
+        </p>
+      </div>
+    );
   }
 
   if (!projects?.length) {
