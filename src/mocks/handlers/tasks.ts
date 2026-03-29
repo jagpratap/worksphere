@@ -1,6 +1,6 @@
 import { http } from "msw";
 
-import { ROLES } from "@/constants";
+import { ROLES, TASK_PRIORITY, TASK_STATUS } from "@/constants";
 
 import type { MockTask } from "../fixtures/tasks";
 
@@ -37,10 +37,6 @@ function isProjectOwner(userId: string, role: string, projectId: string): boolea
   if (!project)
     return false;
   return project.ownerId === userId;
-}
-
-function canEditAllFields(userId: string, role: string, projectId: string): boolean {
-  return isProjectOwner(userId, role, projectId);
 }
 
 /* =========================================================
@@ -155,7 +151,7 @@ const createTask = http.post(
       });
     }
 
-    if (!canEditAllFields(user.id, user.role, projectId as string)) {
+    if (!isProjectOwner(user.id, user.role, projectId as string)) {
       return errorResponse({
         code: ERROR_CODES.FORBIDDEN,
         message: ERROR_MESSAGES.FORBIDDEN,
@@ -163,7 +159,7 @@ const createTask = http.post(
       });
     }
 
-    const taskStatus = (status as MockTask["status"]) ?? "todo";
+    const taskStatus = (status as MockTask["status"]) ?? TASK_STATUS.TODO;
 
     // Place new task at the end of its status column
     const siblingCount = mswStore
@@ -180,7 +176,7 @@ const createTask = http.post(
       title: title as string,
       description: (description as string) ?? "",
       status: taskStatus,
-      priority: (priority as MockTask["priority"]) ?? "medium",
+      priority: (priority as MockTask["priority"]) ?? TASK_PRIORITY.MEDIUM,
       assigneeId: (assigneeId as string) ?? null,
       order: siblingCount,
       createdAt: now,
@@ -225,7 +221,7 @@ const updateTask = http.patch(
     const body = await request.json() as Record<string, unknown>;
 
     // Members/assignees can only update status and order (drag-and-drop)
-    if (!canEditAllFields(user.id, user.role, task.projectId)) {
+    if (!isProjectOwner(user.id, user.role, task.projectId)) {
       const isAssignee = task.assigneeId === user.id;
 
       if (!isAssignee) {
@@ -254,10 +250,24 @@ const updateTask = http.patch(
       });
     }
 
+    const allowed: Partial<MockTask> = {};
+    if ("title" in body)
+      allowed.title = body.title as string;
+    if ("description" in body)
+      allowed.description = body.description as string;
+    if ("status" in body)
+      allowed.status = body.status as MockTask["status"];
+    if ("priority" in body)
+      allowed.priority = body.priority as MockTask["priority"];
+    if ("assigneeId" in body)
+      allowed.assigneeId = (body.assigneeId as string) ?? null;
+    if ("order" in body)
+      allowed.order = body.order as number;
+
     mswStore.updateTask(id, {
-      ...body,
+      ...allowed,
       updatedAt: new Date().toISOString(),
-    } as Partial<MockTask>);
+    });
 
     return successResponse({
       data: mswStore.findTaskById(id)!,

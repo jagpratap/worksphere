@@ -23,11 +23,12 @@ import { paths } from "@/config/paths";
 import { ROLE_LABELS } from "@/constants";
 import { selectCurrentUser, useSignOutMutation } from "@/features/auth";
 import { useAppSelector } from "@/store";
+import { getInitials } from "@/utils/string";
 
 export function NavUser() {
   const user = useAppSelector(selectCurrentUser);
   const { isMobile } = useSidebar();
-  const [signOut, { isLoading: isSigningOut }] = useSignOutMutation();
+  const [signOut, { isLoading }] = useSignOutMutation();
 
   if (!user)
     return null;
@@ -74,10 +75,10 @@ export function NavUser() {
 
             <DropdownMenuItem
               onClick={() => signOut()}
-              disabled={isSigningOut}
+              disabled={isLoading}
             >
               <LogOut />
-              {isSigningOut ? "Signing out…" : "Sign out"}
+              {isLoading ? "Signing out…" : "Sign out"}
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
@@ -87,20 +88,12 @@ export function NavUser() {
 }
 
 function UserInfo({ user }: { user: SafeUser }) {
-  // Limit to 2 characters to fit the avatar (e.g. "John Michael Smith" → "JM")
-  const initials = user.name
-    .split(" ")
-    .map(part => part[0])
-    .join("")
-    .toUpperCase()
-    .slice(0, 2) || "?";
-
   return (
     <>
       <Avatar className="size-8 rounded-lg">
         {user.avatar && <AvatarImage src={user.avatar} alt={user.name} />}
         <AvatarFallback className="rounded-lg text-xs">
-          {initials}
+          {getInitials(user.name)}
         </AvatarFallback>
       </Avatar>
       <div className="grid flex-1 text-left text-sm leading-tight">
