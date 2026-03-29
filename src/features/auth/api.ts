@@ -38,7 +38,7 @@ export const authApi = baseApi.injectEndpoints({
           tokenStorage.set(data.refreshToken);
         }
         catch {
-          // Surfaced via isError at call site
+          // Error still surfaces at the call site (via isError or .unwrap())
         }
       },
     }),
@@ -59,7 +59,7 @@ export const authApi = baseApi.injectEndpoints({
           tokenStorage.set(data.refreshToken);
         }
         catch {
-          // Surfaced via isError at call site
+          // Error still surfaces at the call site (via isError or .unwrap())
         }
       },
     }),
@@ -67,6 +67,10 @@ export const authApi = baseApi.injectEndpoints({
     // ── POST /api/auth/signout ─────────────────────────────────────────────────────
     signOut: builder.mutation<MessageResponse, void>({
       queryFn: async (_arg, { dispatch }, _extraOptions, baseQuery) => {
+        /*
+        * Optimistic: clear local state immediately, then best-effort server token revocation.
+        */
+
         const refreshToken = tokenStorage.get();
 
         dispatch(clearCredentials());
@@ -80,7 +84,7 @@ export const authApi = baseApi.injectEndpoints({
           });
         }
 
-        return { data: { message: "Signed out" } };
+        return { data: { message: "Signed out successfully!" } };
       },
     }),
 

@@ -1,6 +1,8 @@
 import { ArrowRight } from "lucide-react";
 import { Link, Outlet, useLocation } from "react-router";
 
+import type { Role } from "@/constants";
+
 import { Button } from "@/components/ui/button";
 import { paths } from "@/config/paths";
 import { ROLE_HOME_ROUTE } from "@/config/roles";
@@ -23,24 +25,36 @@ export function PublicLayout() {
         <Link to={paths.home.path} className="text-sm font-semibold tracking-tight">
           WorkSphere
         </Link>
-        {isAuthenticated && role
-          ? (
-              <Button size="sm" asChild>
-                <Link to={ROLE_HOME_ROUTE[role]}>
-                  Dashboard
-                  <ArrowRight className="size-4" />
-                </Link>
-              </Button>
-            )
-          : !isAuthPage
-              ? (
-                  <Button size="sm" variant="ghost" asChild>
-                    <Link to={paths.auth.signin.path}>Sign in</Link>
-                  </Button>
-                )
-              : null}
+        {navAction(isAuthenticated, role, isAuthPage)}
       </header>
       <Outlet />
     </div>
   );
+}
+
+function navAction(
+  isAuthenticated: boolean,
+  role: Role | null,
+  isAuthPage: boolean,
+) {
+  if (isAuthenticated && role) {
+    return (
+      <Button size="sm" asChild>
+        <Link to={ROLE_HOME_ROUTE[role]}>
+          Dashboard
+          <ArrowRight className="size-4" />
+        </Link>
+      </Button>
+    );
+  }
+
+  if (!isAuthPage) {
+    return (
+      <Button size="sm" variant="ghost" asChild>
+        <Link to={paths.auth.signin.path}>Sign in</Link>
+      </Button>
+    );
+  }
+
+  return null;
 }

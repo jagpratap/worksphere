@@ -4,7 +4,11 @@ import type { Permission } from "@/config/permissions";
 
 import { selectCurrentUserRole } from "@/features/auth";
 import { useAppSelector } from "@/store";
-import { canAccess, hasAllPermissions, hasAnyPermission } from "@/utils/permissions";
+import {
+  canAccess,
+  hasAllPermissions,
+  hasAnyPermission,
+} from "@/utils/permissions";
 
 /**
  * Binds the permissions engine to the current user's role from Redux.

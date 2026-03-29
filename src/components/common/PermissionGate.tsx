@@ -50,16 +50,13 @@ export function PermissionGate({
   children,
   fallback = null,
 }: PermissionGateProps) {
-  const { can, canAny, canAll } = usePermission();
+  const { canAny, canAll } = usePermission();
 
   const permissions = Array.isArray(requires) ? requires : [requires];
 
-  const hasAccess
-    = permissions.length === 1
-      ? can(permissions[0])
-      : match === "all"
-        ? canAll(permissions)
-        : canAny(permissions);
+  const check = match === "all" ? canAll : canAny;
+
+  const hasAccess = check(permissions);
 
   return hasAccess ? <>{children}</> : <>{fallback}</>;
 }

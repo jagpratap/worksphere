@@ -1,6 +1,6 @@
 import { Navigate, Outlet, useSearchParams } from "react-router";
 
-import { FullPageSpinner } from "@/components/common/FullPageSpinner";
+import { FullPageSpinner } from "@/components/common";
 import { ROLE_HOME_ROUTE } from "@/config/roles";
 import {
   selectCurrentUserRole,

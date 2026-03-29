@@ -2,7 +2,7 @@ import { http } from "msw";
 
 import type { Project } from "@/types";
 
-import { ROLES } from "@/constants";
+import { PROJECT_COLORS, PROJECT_STATUS, ROLES } from "@/constants";
 
 import type { MockProject } from "../fixtures/projects";
 
@@ -54,10 +54,17 @@ const listProjects = http.get(
 
     const projects = mswStore.getProjects();
 
-    const visible = projects.filter(p => canAccessProject(user.id, user.role, p));
+    const accessibleProjects = projects.filter(p => canAccessProject(user.id, user.role, p));
+
+    const data = accessibleProjects
+      .map(withTaskCount)
+      .map(p => ({
+        ...p,
+        owner: p.ownerId ? sanitizeUser(mswStore.findUserById(p.ownerId)!) : null,
+      }));
 
     return successResponse({
-      data: visible.map(withTaskCount),
+      data,
       message: SUCCESS_MESSAGES.PROJECTS_FETCHED,
     });
   }),
@@ -140,8 +147,8 @@ const createProject = http.post(
       name: name as string,
       key: (key as string).toUpperCase(),
       description: (description as string) ?? "",
-      status: (status as MockProject["status"]) ?? "planning",
-      color: (color as MockProject["color"]) ?? "blue",
+      status: (status as MockProject["status"]) ?? PROJECT_STATUS.PLANNING,
+      color: (color as MockProject["color"]) ?? PROJECT_COLORS.BLUE,
       ownerId: user.id,
       memberIds: (memberIds as string[]) ?? [],
       createdAt: now,

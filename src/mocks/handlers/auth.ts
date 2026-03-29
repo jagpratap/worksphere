@@ -310,7 +310,7 @@ const resetPassword = http.post(`${AUTH_BASE_URL}/reset-password`, async ({ requ
     });
   }
 
-  user.password = newPassword;
+  mswStore.updateUser(user.id, { password: newPassword });
   mswStore.deletePasswordResetToken(email);
 
   return successResponse({
@@ -403,7 +403,7 @@ const verifyEmail = http.post(`${AUTH_BASE_URL}/verify-email`, async ({ request 
     });
   }
 
-  user.isVerified = true;
+  mswStore.updateUser(user.id, { isVerified: true });
   mswStore.deleteEmailVerificationToken(email);
 
   return successResponse({

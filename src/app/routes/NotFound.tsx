@@ -1,5 +1,6 @@
 import { Link } from "react-router";
 
+import { PageContainer } from "@/components/common";
 import { paths } from "@/config/paths";
 import { ROLE_HOME_ROUTE } from "@/config/roles";
 import { selectCurrentUserRole, selectIsAuthenticated } from "@/features/auth";
@@ -12,7 +13,7 @@ export default function NotFoundRoute() {
   const homePath = (isAuthenticated && role) ? ROLE_HOME_ROUTE[role] : paths.home.path;
 
   return (
-    <div className="flex min-h-svh flex-col items-center justify-center gap-4 p-4">
+    <PageContainer>
       <h1 className="text-6xl font-bold text-muted-foreground">404</h1>
       <p className="text-lg text-muted-foreground">Page not found</p>
       <Link
@@ -21,6 +22,6 @@ export default function NotFoundRoute() {
       >
         Back to home
       </Link>
-    </div>
+    </PageContainer>
   );
 }

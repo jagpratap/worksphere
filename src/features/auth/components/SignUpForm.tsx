@@ -45,7 +45,7 @@ type SignUpFormProps = {
 export function SignUpForm({ className, ...props }: SignUpFormProps) {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const [signUp, { isLoading: isSubmitting }] = useSignUpMutation();
+  const [signUp, { isLoading }] = useSignUpMutation();
 
   const {
     control,
@@ -227,9 +227,9 @@ export function SignUpForm({ className, ...props }: SignUpFormProps) {
                 <Button
                   type="submit"
                   className="w-full"
-                  disabled={isSubmitting}
+                  disabled={isLoading}
                 >
-                  {isSubmitting ? "Creating account..." : "Create Account"}
+                  {isLoading ? "Creating account..." : "Create Account"}
                 </Button>
                 <FieldDescription className="text-center">
                   Already have an account?

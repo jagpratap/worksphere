@@ -1,8 +1,7 @@
 import { useMemo } from "react";
 import { createBrowserRouter, RouterProvider } from "react-router";
 
-import { ErrorFallback } from "@/components/common/ErrorFallback";
-import { FullPageSpinner } from "@/components/common/FullPageSpinner";
+import { ErrorFallback, FullPageSpinner } from "@/components/common";
 import { paths } from "@/config/paths";
 
 import { AuthGuard, GuestGuard, RoleGuard } from "./guards";
@@ -91,6 +90,14 @@ export function Router() {
                     {
                       path: paths.app.root.path,
                       lazy: lazyRoute(() => import("./routes/app/Dashboard")),
+                    },
+                    {
+                      path: paths.app.projects.root.path,
+                      lazy: lazyRoute(() => import("./routes/app/Projects")),
+                    },
+                    {
+                      path: paths.app.projects.detail().path,
+                      lazy: lazyRoute(() => import("./routes/app/ProjectDetail")),
                     },
                   ],
                 },

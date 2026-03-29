@@ -36,15 +36,15 @@ type ForgotPasswordFormProps = {
 };
 
 export function ForgotPasswordForm({ className, ...props }: ForgotPasswordFormProps) {
-  const [forgotPassword, { isLoading: isSubmitting }] = useForgotPasswordMutation();
+  const [forgotPassword, { isLoading }] = useForgotPasswordMutation();
 
   const [isEmailSent, setIsEmailSent] = useState(false);
 
   const {
     control,
-    handleSubmit,
     setError,
     getValues,
+    handleSubmit,
   } = useForm<ForgotPasswordFormValues>({
     resolver: zodResolver(forgotPasswordSchema),
     defaultValues: {
@@ -63,6 +63,7 @@ export function ForgotPasswordForm({ className, ...props }: ForgotPasswordFormPr
     catch (err) {
       const { message, fieldErrors } = parseApiError<ForgotPasswordFormValues>(err);
 
+      // Set field-level errors
       (Object.entries(fieldErrors)).forEach(
         ([field, msg]) => {
           setError(field as keyof ForgotPasswordFormValues, {
@@ -72,6 +73,7 @@ export function ForgotPasswordForm({ className, ...props }: ForgotPasswordFormPr
         },
       );
 
+      // Set general error
       if (Object.keys(fieldErrors).length === 0) {
         toast.error(message);
       }
@@ -98,13 +100,15 @@ export function ForgotPasswordForm({ className, ...props }: ForgotPasswordFormPr
                 <FieldDescription className="text-center">
                   Didn&apos;t receive the email? Check your spam folder or
                   {" "}
-                  <button
+                  <Button
                     type="button"
-                    className="underline underline-offset-4 hover:text-primary"
+                    variant="link"
+                    className="h-auto p-0 text-muted-foreground underline underline-offset-4 hover:text-primary"
+                    disabled={isLoading}
                     onClick={() => handleSubmit(onSubmit)()}
                   >
-                    try again
-                  </button>
+                    {isLoading ? "Sending..." : "try again"}
+                  </Button>
                 </FieldDescription>
               </Field>
               <Field>
@@ -161,9 +165,9 @@ export function ForgotPasswordForm({ className, ...props }: ForgotPasswordFormPr
                 <Button
                   type="submit"
                   className="w-full"
-                  disabled={isSubmitting}
+                  disabled={isLoading}
                 >
-                  {isSubmitting ? "Sending..." : "Send reset link"}
+                  {isLoading ? "Sending..." : "Send reset link"}
                 </Button>
               </Field>
 

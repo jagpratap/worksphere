@@ -2,6 +2,8 @@ import { isRouteErrorResponse, Link, useRouteError } from "react-router";
 
 import { paths } from "@/config/paths";
 
+import { PageContainer } from "./PageContainer";
+
 /**
  * Route error boundary — used as `errorElement` in the router.
  * Handles both thrown Response errors and unexpected JS errors.
@@ -21,7 +23,7 @@ export function ErrorFallback() {
   }
 
   return (
-    <div className="flex min-h-svh flex-col items-center justify-center gap-group p-page-x">
+    <PageContainer>
       <h1 className="text-6xl font-bold text-muted-foreground">{status}</h1>
       <p className="text-lg text-muted-foreground">{message}</p>
       <Link
@@ -30,6 +32,6 @@ export function ErrorFallback() {
       >
         Back to home
       </Link>
-    </div>
+    </PageContainer>
   );
 }

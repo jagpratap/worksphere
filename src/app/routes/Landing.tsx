@@ -13,7 +13,7 @@ export default function LandingRoute() {
 
   return (
     <main className="flex-1 flex flex-col items-center justify-center gap-group p-page-x text-center">
-      <h1 className="max-w-2xl text-4xl font-bold tracking-tight sm:text-5xl">
+      <h1 className="max-w-2xl text-5xl font-bold tracking-tight">
         Manage projects,
         <br />
         not chaos.
@@ -33,7 +33,7 @@ export default function LandingRoute() {
             </Button>
           )
         : (
-            <div className="flex gap-3">
+            <div className="flex gap-inline">
               <Button size="lg" asChild>
                 <Link to={paths.auth.signup.path}>Get started</Link>
               </Button>

@@ -44,15 +44,12 @@ export function ResetPasswordForm({ className, ...props }: ResetPasswordFormProp
   const email = searchParams.get("email");
   const token = searchParams.get("token");
 
-  const [resetPassword, { isLoading: isSubmitting }] = useResetPasswordMutation();
-  const [isResetComplete, setIsResetComplete] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [resetPassword, { isLoading }] = useResetPasswordMutation();
 
   const {
     control,
-    handleSubmit,
     setError,
+    handleSubmit,
   } = useForm<ResetPasswordFormValues>({
     resolver: zodResolver(resetPasswordSchema),
     defaultValues: {
@@ -61,10 +58,23 @@ export function ResetPasswordForm({ className, ...props }: ResetPasswordFormProp
     },
   });
 
+  const [isResetComplete, setIsResetComplete] = useState(false);
+  const [visible, setVisible] = useState({
+    password: false,
+    confirm: false,
+  });
+
   // ── Missing params — redirect to forgot password ────────────────────────
   if (!email || !token) {
     return <Navigate to={paths.auth.forgotPassword.path} replace />;
   }
+
+  const handleVisibleToggle = (field: "password" | "confirm") => {
+    setVisible(prev => ({
+      ...prev,
+      [field]: !prev[field],
+    }));
+  };
 
   const onSubmit = async (values: ResetPasswordFormValues) => {
     try {
@@ -81,6 +91,7 @@ export function ResetPasswordForm({ className, ...props }: ResetPasswordFormProp
     catch (err) {
       const { message, fieldErrors } = parseApiError<ResetPasswordFormValues>(err);
 
+      // Set field-level errors
       (Object.entries(fieldErrors) as [keyof ResetPasswordFormValues, string][]).forEach(
         ([field, msg]) => {
           if (msg) {
@@ -89,6 +100,7 @@ export function ResetPasswordForm({ className, ...props }: ResetPasswordFormProp
         },
       );
 
+      // Set general error
       if (Object.keys(fieldErrors).length === 0) {
         toast.error(message);
       }
@@ -144,7 +156,7 @@ export function ResetPasswordForm({ className, ...props }: ResetPasswordFormProp
                       <InputGroupInput
                         {...field}
                         id={field.name}
-                        type={showPassword ? "text" : "password"}
+                        type={visible.password ? "text" : "password"}
                         aria-invalid={fieldState.invalid}
                       />
                       <InputGroupAddon align="inline-end">
@@ -152,10 +164,10 @@ export function ResetPasswordForm({ className, ...props }: ResetPasswordFormProp
                           type="button"
                           variant="ghost"
                           size="icon-xs"
-                          aria-label={showPassword ? "Hide password" : "Show password"}
-                          onClick={() => setShowPassword(prev => !prev)}
+                          aria-label={visible.password ? "Hide password" : "Show password"}
+                          onClick={() => handleVisibleToggle("password")}
                         >
-                          {showPassword
+                          {visible.password
                             ? <EyeOff className="size-4" />
                             : <Eye className="size-4" />}
                         </InputGroupButton>
@@ -179,7 +191,7 @@ export function ResetPasswordForm({ className, ...props }: ResetPasswordFormProp
                       <InputGroupInput
                         {...field}
                         id={field.name}
-                        type={showConfirmPassword ? "text" : "password"}
+                        type={visible.confirm ? "text" : "password"}
                         aria-invalid={fieldState.invalid}
                       />
                       <InputGroupAddon align="inline-end">
@@ -187,10 +199,10 @@ export function ResetPasswordForm({ className, ...props }: ResetPasswordFormProp
                           type="button"
                           variant="ghost"
                           size="icon-xs"
-                          aria-label={showConfirmPassword ? "Hide password" : "Show password"}
-                          onClick={() => setShowConfirmPassword(prev => !prev)}
+                          aria-label={visible.confirm ? "Hide password" : "Show password"}
+                          onClick={() => handleVisibleToggle("confirm")}
                         >
-                          {showConfirmPassword
+                          {visible.confirm
                             ? <EyeOff className="size-4" />
                             : <Eye className="size-4" />}
                         </InputGroupButton>
@@ -208,9 +220,9 @@ export function ResetPasswordForm({ className, ...props }: ResetPasswordFormProp
                 <Button
                   type="submit"
                   className="w-full"
-                  disabled={isSubmitting}
+                  disabled={isLoading}
                 >
-                  {isSubmitting ? "Resetting..." : "Reset password"}
+                  {isLoading ? "Resetting..." : "Reset password"}
                 </Button>
               </Field>
 

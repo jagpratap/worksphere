@@ -46,28 +46,3 @@ export type Task = {
   createdAt: string;
   updatedAt: string;
 };
-
-// ─── Input Types ────────────────────────────────────────────────────────────
-
-export type CreateProjectInput = Pick<Project, "name" | "key" | "description" | "status" | "color"> & {
-  memberIds?: string[];
-};
-
-export type UpdateProjectInput = Partial<CreateProjectInput>;
-
-export type CreateTaskInput = {
-  projectId: string;
-  title: string;
-  description?: string;
-  status?: TaskStatus;
-  priority?: TaskPriority;
-  assigneeId?: string | null;
-};
-
-export type UpdateTaskInput = Partial<Omit<CreateTaskInput, "projectId">>;
-
-export type ReorderTaskInput = {
-  id: string;
-  status: TaskStatus;
-  order: number;
-};

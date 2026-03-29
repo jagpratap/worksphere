@@ -6,7 +6,13 @@ import { Link, useNavigate, useSearchParams } from "react-router";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import {
   Field,
   FieldDescription,
@@ -15,7 +21,12 @@ import {
   FieldLabel,
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import { InputGroup, InputGroupAddon, InputGroupButton, InputGroupInput } from "@/components/ui/input-group";
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupButton,
+  InputGroupInput,
+} from "@/components/ui/input-group";
 import { ENV } from "@/config/env";
 import { paths } from "@/config/paths";
 import { ROLE_HOME_ROUTE } from "@/config/roles";
@@ -35,7 +46,7 @@ type SignInFormProps = {
 export function SignInForm({ className, ...props }: SignInFormProps) {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const [signIn, { isLoading: isSubmitting }] = useSignInMutation();
+  const [signIn, { isLoading }] = useSignInMutation();
 
   const {
     control,
@@ -159,9 +170,9 @@ export function SignInForm({ className, ...props }: SignInFormProps) {
                 <Button
                   type="submit"
                   className="w-full"
-                  disabled={isSubmitting}
+                  disabled={isLoading}
                 >
-                  {isSubmitting ? "Signing in..." : "Sign in"}
+                  {isLoading ? "Signing in..." : "Sign in"}
                 </Button>
                 <FieldDescription className="text-center">
                   Don&apos;t have an account?
@@ -181,6 +192,7 @@ export function SignInForm({ className, ...props }: SignInFormProps) {
         <a href="#">Terms of Service</a>
         {" "}
         and
+        {" "}
         <a href="#">Privacy Policy</a>
         .
       </FieldDescription>

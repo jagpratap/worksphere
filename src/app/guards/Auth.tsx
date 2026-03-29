@@ -1,6 +1,6 @@
 import { Navigate, Outlet, useLocation } from "react-router";
 
-import { FullPageSpinner } from "@/components/common/FullPageSpinner";
+import { FullPageSpinner } from "@/components/common";
 import { paths } from "@/config/paths";
 import {
   selectIsAuthenticated,

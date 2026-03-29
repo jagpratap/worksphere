@@ -11,7 +11,7 @@ import {
 import { store } from "@/store";
 import { tokenStorage } from "@/store/local-storage";
 
-export async function rootLoader() {
+export async function rootLoader(): Promise<null> {
   const isInitialized = selectIsInitialized(store.getState());
 
   if (isInitialized)

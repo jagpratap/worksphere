@@ -1,16 +1,19 @@
 import { Link } from "react-router";
 
+import { PageContainer } from "@/components/common";
 import { paths } from "@/config/paths";
 import { ROLE_HOME_ROUTE } from "@/config/roles";
-import { selectCurrentUserRole } from "@/features/auth";
+import { selectCurrentUserRole, selectIsAuthenticated } from "@/features/auth";
 import { useAppSelector } from "@/store";
 
 export default function UnauthorizedRoute() {
+  const isAuthenticated = useAppSelector(selectIsAuthenticated);
   const role = useAppSelector(selectCurrentUserRole);
-  const homePath = role ? ROLE_HOME_ROUTE[role] : paths.home.path;
+
+  const homePath = (isAuthenticated && role) ? ROLE_HOME_ROUTE[role] : paths.home.path;
 
   return (
-    <div className="flex min-h-svh flex-col items-center justify-center gap-group p-page-x">
+    <PageContainer>
       <h1 className="text-6xl font-bold text-muted-foreground">403</h1>
       <p className="text-lg text-muted-foreground">
         You don't have access to this page
@@ -21,6 +24,6 @@ export default function UnauthorizedRoute() {
       >
         Go to dashboard
       </Link>
-    </div>
+    </PageContainer>
   );
 }

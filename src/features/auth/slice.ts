@@ -12,7 +12,8 @@ const initialState: AuthState = {
   accessToken: null,
   refreshToken: null,
   isAuthenticated: false,
-  isInitialized: false,
+  isInitialized: false, // Prevents guards from redirecting (or flashing login) before the app has had a chance to restore a previous session in the root loader
+
 };
 
 const authSlice = createSlice({

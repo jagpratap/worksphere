@@ -16,6 +16,7 @@ import {
   SidebarRail,
 } from "@/components/ui/sidebar";
 import { NAV_GROUPS } from "@/config/navigation";
+import { paths } from "@/config/paths";
 import { usePermission } from "@/hooks/use-permission";
 
 import { DevRoleSwitcher } from "./DevRoleSwitcher";
@@ -28,7 +29,7 @@ export function AppSidebar() {
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" asChild>
-              <Link to="/">
+              <Link to={paths.home.path}>
                 <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
                   <span className="text-sm font-bold">W</span>
                 </div>
@@ -61,17 +62,14 @@ export function AppSidebar() {
 }
 
 // ─── NavGroupSection ────────────────────────────────────────────────────────
-// Renders a group only if the user has permission for at least one item.
 
 function NavGroupSection({ group }: { group: NavGroup }) {
   const { can } = usePermission();
   const location = useLocation();
 
-  // Filter items to only those the user can access
-  const visibleItems = group.items.filter(item => can(item.permission));
+  const permittedItems = group.items.filter(item => can(item.permission));
 
-  // Hide the entire group if no items are visible
-  if (visibleItems.length === 0)
+  if (permittedItems.length === 0)
     return null;
 
   return (
@@ -79,10 +77,14 @@ function NavGroupSection({ group }: { group: NavGroup }) {
       <SidebarGroupLabel>{group.label}</SidebarGroupLabel>
       <SidebarGroupContent>
         <SidebarMenu>
-          {visibleItems.map((item) => {
+          {permittedItems.map((item) => {
+            const hasNestedSibling = permittedItems.some(
+              other => other.path !== item.path && other.path.startsWith(`${item.path}/`),
+            );
+
             const isActive
               = location.pathname === item.path
-                || (item.path !== "/" && location.pathname.startsWith(`${item.path}/`));
+                || (item.path !== "/" && !hasNestedSibling && location.pathname.startsWith(`${item.path}/`));
 
             return (
               <SidebarMenuItem key={item.path}>
