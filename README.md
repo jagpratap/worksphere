@@ -1,75 +1,102 @@
-# React + TypeScript + Vite
+# WorkSphere
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A role-based project management SaaS application — think lightweight Jira meets Notion. Built as a frontend-complete demo with a fully mocked API layer.
 
-Currently, two official plugins are available:
+## Tech Stack
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- **React 19** + TypeScript + Vite
+- **Redux Toolkit** + RTK Query (data fetching & caching)
+- **React Router v7** (file-based lazy routes, role guards)
+- **React Hook Form** + Zod (form validation)
+- **shadcn/ui** + Tailwind CSS v4 (component library)
+- **dnd-kit** (drag-and-drop kanban board)
+- **MSW 2.x** (mock API with localStorage persistence)
 
-## React Compiler
+## Features
 
-The React Compiler is enabled on this template. See [this documentation](https://react.dev/learn/react-compiler) for more information.
+### Authentication & Authorization
+- Role-based access control (Admin / Manager / Member)
+- Sign in, sign up, forgot/reset password flows
+- Route guards with automatic redirects
 
-Note: This will impact Vite dev & build performances.
+### Project Management
+- Create, edit, archive projects
+- Kanban board with drag-and-drop task reordering
+- Project overview with member management
 
-## Expanding the ESLint configuration
+### Task Management
+- Full CRUD with status, priority, assignee, sprint assignment
+- URL-synced filters (status, priority, assignee, search)
+- My Tasks page with personal task view
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+### Sprint Planning
+- Create sprints with date ranges, goals, and status tracking
+- Progress bars with task completion stats
+- Max one active sprint per project enforcement
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+### Time Tracking
+- Log time entries against tasks (manual entry)
+- Daily/weekly summary stats
+- Filter and search entries
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+### Team Workload
+- Visual task distribution per team member
+- Status breakdown with colored progress bars
+- Filter by project
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+### Coming Soon
+- Admin Dashboard analytics & charts
+- User management (CRUD)
+- Billing & subscription management
+- Audit log viewer
+- Real-time notifications
+- Profile & settings pages
+- Advanced reporting
+
+## Mock API
+
+This app runs entirely in the browser using **MSW (Mock Service Worker)**. No backend server needed. Data persists in `localStorage` — clear it to reset to fixture data.
+
+### Test Credentials
+
+All accounts use password: `password123`
+
+| Role | Email | Access |
+|------|-------|--------|
+| Admin | `admin@worksphere.dev` | Full system access |
+| Manager | `bob@worksphere.dev` | Projects, sprints, workload |
+| Member | `carol@worksphere.dev` | My tasks, time tracker |
+
+## Getting Started
+
+```bash
+pnpm install
+pnpm dev
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+Open [http://localhost:5173](http://localhost:5173) and sign in with any test credential above.
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## Scripts
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+pnpm dev          # Start dev server
+pnpm build        # Type-check + production build
+pnpm lint         # Run ESLint
+pnpm lint:fix     # ESLint with auto-fix
+```
+
+## Project Structure
+
+```
+src/
+├── app/            # Router, layouts, guards, route pages
+├── components/     # ui/ (shadcn), common/ (shared app components)
+├── config/         # Paths, navigation, roles, permissions, env
+├── constants/      # Business enums, labels, variants
+├── features/       # Feature modules (auth, projects, tasks, sprints, etc.)
+├── lib/            # Utility wrappers (cn, utils)
+├── mocks/          # MSW handlers, fixtures, store persistence
+├── store/          # Redux store configuration
+├── types/          # Shared entity types
+└── utils/          # Pure helper functions
 ```

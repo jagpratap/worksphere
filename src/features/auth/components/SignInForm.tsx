@@ -1,5 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, Info } from "lucide-react";
 import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { Link, useNavigate, useSearchParams } from "react-router";
@@ -27,7 +27,6 @@ import {
   InputGroupButton,
   InputGroupInput,
 } from "@/components/ui/input-group";
-import { ENV } from "@/config/env";
 import { paths } from "@/config/paths";
 import { ROLE_HOME_ROUTE } from "@/config/roles";
 import { cn } from "@/lib/utils";
@@ -37,6 +36,12 @@ import type { SignInFormValues } from "../schemas";
 
 import { useSignInMutation } from "../api";
 import { signInSchema } from "../schemas";
+
+const TEST_ACCOUNTS = [
+  { role: "Admin", email: "admin@worksphere.dev", access: "Full access" },
+  { role: "Manager", email: "bob@worksphere.dev", access: "Projects & teams" },
+  { role: "Member", email: "carol@worksphere.dev", access: "Tasks & time" },
+] as const;
 
 type SignInFormProps = {
   className?: string;
@@ -51,16 +56,22 @@ export function SignInForm({ className, ...props }: SignInFormProps) {
   const {
     control,
     setError,
+    setValue,
     handleSubmit,
   } = useForm<SignInFormValues>({
     resolver: zodResolver(signInSchema),
     defaultValues: {
-      email: ENV.isDev ? "admin@worksphere.dev" : "",
-      password: ENV.isDev ? "password123" : "",
+      email: "",
+      password: "",
     },
   });
 
   const [showPassword, setShowPassword] = useState(false);
+
+  const fillCredentials = (email: string) => {
+    setValue("email", email);
+    setValue("password", "password123");
+  };
 
   const onSubmit = async (values: SignInFormValues) => {
     try {
@@ -90,7 +101,41 @@ export function SignInForm({ className, ...props }: SignInFormProps) {
   };
 
   return (
-    <div className={cn("flex flex-col gap-6", className)} {...props}>
+    <div className={cn("flex flex-col gap-4", className)} {...props}>
+      {/* Demo Notice */}
+      <div className="rounded-lg border border-primary/20 bg-primary/5 p-4">
+        <div className="mb-2 flex items-center gap-2">
+          <Info className="size-4 text-primary" />
+          <span className="text-sm font-medium">Demo Mode</span>
+        </div>
+        <p className="mb-3 text-xs text-muted-foreground">
+          This app uses a mock API (MSW) — no real server. Data persists in localStorage.
+          Click any role below to auto-fill credentials.
+        </p>
+        <div className="grid gap-1.5">
+          {TEST_ACCOUNTS.map(account => (
+            <button
+              key={account.role}
+              type="button"
+              className="flex items-center justify-between rounded-md border bg-background px-3 py-2 text-left text-sm transition-colors hover:bg-muted"
+              onClick={() => fillCredentials(account.email)}
+            >
+              <div className="flex items-center gap-2">
+                <span className="w-16 font-medium">{account.role}</span>
+                <span className="text-xs text-muted-foreground">{account.email}</span>
+              </div>
+              <span className="text-xs text-muted-foreground">{account.access}</span>
+            </button>
+          ))}
+        </div>
+        <p className="mt-2 text-center text-[11px] text-muted-foreground">
+          Password for all accounts:
+          {" "}
+          <code className="rounded bg-muted px-1 py-0.5 font-mono">password123</code>
+        </p>
+      </div>
+
+      {/* Sign In Form */}
       <Card>
         <CardHeader className="text-center">
           <CardTitle className="text-xl">Welcome back</CardTitle>

@@ -80,6 +80,18 @@ export function Router() {
                       path: paths.admin.root.path,
                       lazy: lazyRoute(() => import("./routes/admin/Dashboard")),
                     },
+                    {
+                      path: paths.admin.users.path,
+                      lazy: lazyRoute(() => import("./routes/admin/Users")),
+                    },
+                    {
+                      path: paths.admin.billing.path,
+                      lazy: lazyRoute(() => import("./routes/admin/Billing")),
+                    },
+                    {
+                      path: paths.admin.auditLog.path,
+                      lazy: lazyRoute(() => import("./routes/admin/AuditLog")),
+                    },
                   ],
                 },
 

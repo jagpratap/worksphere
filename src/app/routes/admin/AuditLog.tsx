@@ -1,18 +1,18 @@
-import { Bell } from "lucide-react";
+import { Shield } from "lucide-react";
 
 import { PageHeader } from "@/components/common";
 import { Card, CardContent } from "@/components/ui/card";
 
-export default function NotificationsRoute() {
+export default function AuditLogRoute() {
   return (
     <>
-      <PageHeader title="Notifications" description="Stay updated on project activity" />
+      <PageHeader title="Audit Log" description="Track system events and user actions" />
       <Card className="border-dashed">
         <CardContent className="flex flex-col items-center justify-center py-16 text-center">
-          <Bell className="mb-4 size-10 text-muted-foreground/50" />
+          <Shield className="mb-4 size-10 text-muted-foreground/50" />
           <h2 className="mb-1 text-lg font-medium">Coming Soon</h2>
           <p className="max-w-sm text-sm text-muted-foreground">
-            Real-time notifications for task assignments, comments, sprint updates, and team activity will be available in a future release.
+            Comprehensive audit logging with filters, search, export, and compliance reporting will be available in a future release.
           </p>
         </CardContent>
       </Card>

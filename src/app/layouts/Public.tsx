@@ -3,6 +3,7 @@ import { Link, Outlet, useLocation } from "react-router";
 
 import type { Role } from "@/constants";
 
+import { ThemeToggle } from "@/components/common";
 import { Button } from "@/components/ui/button";
 import { paths } from "@/config/paths";
 import { ROLE_HOME_ROUTE } from "@/config/roles";
@@ -25,7 +26,10 @@ export function PublicLayout() {
         <Link to={paths.home.path} className="text-sm font-semibold tracking-tight">
           WorkSphere
         </Link>
-        {navAction(isAuthenticated, role, isAuthPage)}
+        <div className="flex items-center gap-2">
+          <ThemeToggle />
+          {navAction(isAuthenticated, role, isAuthPage)}
+        </div>
       </header>
       <Outlet />
     </div>
