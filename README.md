@@ -1,5 +1,7 @@
 # WorkSphere
 
+**[Live Demo](https://worksphere-eta.vercel.app/)**
+
 A role-based project management SaaS application — think lightweight Jira meets Notion. Built as a frontend-complete demo with a fully mocked API layer.
 
 ## Tech Stack
