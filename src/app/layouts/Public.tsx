@@ -1,4 +1,4 @@
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Orbit } from "lucide-react";
 import { Link, Outlet, useLocation } from "react-router";
 
 import type { Role } from "@/constants";
@@ -23,9 +23,17 @@ export function PublicLayout() {
   return (
     <div className="flex flex-col min-h-svh">
       <header className="flex items-center justify-between h-header border-b border-border px-page-x">
-        <Link to={paths.home.path} className="text-sm font-semibold tracking-tight">
-          WorkSphere
-        </Link>
+        <div className="flex items-center gap-6">
+          <Link to={paths.home.path} className="flex items-center gap-2">
+            <div className="flex size-7 items-center justify-center rounded-lg bg-primary">
+              <Orbit className="size-4 text-primary-foreground" strokeWidth={2.5} />
+            </div>
+            <span className="font-heading text-base font-bold tracking-tight">
+              Work
+              <span className="text-primary">Sphere</span>
+            </span>
+          </Link>
+        </div>
         <div className="flex items-center gap-2">
           <ThemeToggle />
           {navAction(isAuthenticated, role, isAuthPage)}
