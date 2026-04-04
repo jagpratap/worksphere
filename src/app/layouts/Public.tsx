@@ -1,4 +1,5 @@
 import { ArrowRight, Orbit } from "lucide-react";
+import { motion } from "motion/react";
 import { Link, Outlet, useLocation } from "react-router";
 
 import type { Role } from "@/constants";
@@ -41,15 +42,17 @@ export function PublicLayout() {
     <div className="flex flex-col min-h-svh">
       <header className="sticky top-0 z-50 flex items-center justify-between h-header border-b border-border/50 bg-background/80 px-page-x backdrop-blur-md">
         <div className="flex items-center gap-8">
-          <Link to={paths.home.path} className="flex items-center gap-2">
-            <div className="flex size-7 items-center justify-center rounded-lg bg-primary">
-              <Orbit className="size-4 text-primary-foreground" strokeWidth={2.5} />
-            </div>
-            <span className="font-heading text-base font-bold tracking-tight">
-              Work
-              <span className="text-primary">Sphere</span>
-            </span>
-          </Link>
+          <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.98 }}>
+            <Link to={paths.home.path} className="flex items-center gap-2">
+              <div className="flex size-7 items-center justify-center rounded-lg bg-primary">
+                <Orbit className="size-4 text-primary-foreground" strokeWidth={2.5} />
+              </div>
+              <span className="font-heading text-base font-bold tracking-tight">
+                Work
+                <span className="text-primary">Sphere</span>
+              </span>
+            </Link>
+          </motion.div>
 
           {isLanding && (
             <nav className="hidden items-center gap-1 md:flex">

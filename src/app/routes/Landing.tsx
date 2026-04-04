@@ -138,12 +138,17 @@ export default function LandingRoute() {
         >
           {isAuthenticated && role
             ? (
-                <Button size="lg" asChild>
+                <MotionButton
+                  size="lg"
+                  asChild
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.98 }}
+                >
                   <Link to={ROLE_HOME_ROUTE[role]}>
                     Go to Dashboard
                     <ArrowRight className="size-4" />
                   </Link>
-                </Button>
+                </MotionButton>
               )
             : (
                 <div className="flex gap-3">
