@@ -205,9 +205,9 @@ export default function LandingRoute() {
                   (color, colIdx) => (
                     <div key={color} className="flex flex-col gap-2">
                       <div className={cn("h-2 w-16 rounded-full", color)} />
-                      {Array.from({ length: 3 - (colIdx % 2) }).map((_, cardIdx) => (
+                      {Array.from({ length: 3 - (colIdx % 2) }, (_, k) => `${color}-card-${k}`).map(id => (
                         <div
-                          key={`${color}-${cardIdx}`}
+                          key={id}
                           className="rounded-lg border bg-background p-2 shadow-sm"
                         >
                           <div className="mb-1.5 h-2 w-3/4 rounded bg-muted-foreground/15" />
@@ -249,7 +249,7 @@ export default function LandingRoute() {
       </motion.section>
 
       {/* ── Features Grid ─────────────────────────────────────────────── */}
-      <section className="px-page-x py-20">
+      <section id="features" className="scroll-mt-(--header-h) px-page-x py-20">
         <div className="mx-auto max-w-5xl">
           <motion.h2
             variants={fadeUp}
@@ -352,9 +352,9 @@ export default function LandingRoute() {
                       (color, col) => (
                         <div key={color} className="space-y-2">
                           <div className={cn("h-1.5 w-10 rounded-full", color)} />
-                          {Array.from({ length: 2 + col }).map((_, i) => (
+                          {Array.from({ length: 2 + col }, (_, k) => `${color}-row-${k}`).map(id => (
                             <div
-                              key={`${color}-${i}`}
+                              key={id}
                               className="h-8 rounded border bg-background shadow-sm"
                             />
                           ))}
@@ -620,7 +620,7 @@ export default function LandingRoute() {
       </section>
 
       {/* ── Pricing ───────────────────────────────────────────────────── */}
-      <section className="border-y bg-muted/30 px-page-x py-20">
+      <section id="pricing" className="scroll-mt-(--header-h) border-y bg-muted/30 px-page-x py-20">
         <div className="mx-auto max-w-5xl">
           <motion.h2
             variants={fadeUp}
@@ -707,12 +707,13 @@ export default function LandingRoute() {
 
       {/* ── FAQ ────────────────────────────────────────────────────────── */}
       <motion.section
+        id="faq"
         variants={fadeIn}
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true, amount: 0.2 }}
         transition={{ duration: 0.6 }}
-        className="px-page-x py-20"
+        className="scroll-mt-(--header-h) px-page-x py-20"
       >
         <div className="mx-auto max-w-3xl">
           <h2 className="mb-2 text-center text-3xl font-semibold tracking-tight">
