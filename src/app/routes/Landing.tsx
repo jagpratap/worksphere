@@ -1,4 +1,5 @@
 import { ArrowRight, Check, ListChecks, Quote } from "lucide-react";
+import { motion } from "motion/react";
 import { Link } from "react-router";
 
 import {
@@ -10,7 +11,13 @@ import {
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import {
   FAQ_ITEMS,
@@ -29,6 +36,52 @@ import { selectCurrentUserRole, selectIsAuthenticated } from "@/features/auth";
 import { cn } from "@/lib/utils";
 import { useAppSelector } from "@/store";
 
+// ── Motion helpers ──────────────────────────────────────────────────────────
+
+const MotionCard = motion.create(Card);
+const MotionButton = motion.create(Button);
+
+const fadeUp = {
+  hidden: { opacity: 0, y: 32 },
+  visible: { opacity: 1, y: 0 },
+};
+
+const fadeIn = {
+  hidden: { opacity: 0 },
+  visible: { opacity: 1 },
+};
+
+const scaleUp = {
+  hidden: { opacity: 0, scale: 0.95 },
+  visible: { opacity: 1, scale: 1 },
+};
+
+const slideLeft = {
+  hidden: { opacity: 0, x: -32 },
+  visible: { opacity: 1, x: 0 },
+};
+
+const slideRight = {
+  hidden: { opacity: 0, x: 32 },
+  visible: { opacity: 1, x: 0 },
+};
+
+const staggerContainer = {
+  hidden: {},
+  visible: {
+    transition: { staggerChildren: 0.1 },
+  },
+};
+
+const staggerContainerFast = {
+  hidden: {},
+  visible: {
+    transition: { staggerChildren: 0.06 },
+  },
+};
+
+// ── Component ───────────────────────────────────────────────────────────────
+
 export default function LandingRoute() {
   const isAuthenticated = useAppSelector(selectIsAuthenticated);
   const role = useAppSelector(selectCurrentUserRole);
@@ -36,7 +89,7 @@ export default function LandingRoute() {
   return (
     <main className="flex-1">
       {/* ── Hero ──────────────────────────────────────────────────────── */}
-      <section className="relative flex flex-col items-center justify-center gap-6 overflow-hidden px-page-x py-24 text-center animate">
+      <section className="relative flex flex-col items-center justify-center gap-6 overflow-hidden px-page-x py-24 text-center">
         {/* Background decoration */}
         <div
           aria-hidden="true"
@@ -46,52 +99,88 @@ export default function LandingRoute() {
           <div className="absolute inset-0 bg-[radial-gradient(circle,var(--muted-foreground)_0.75px,transparent_0.75px)] bg-size-[20px_20px] opacity-15" />
         </div>
 
-        <div className="inline-flex items-center gap-2 rounded-full border bg-muted/50 px-3 py-1 text-sm text-muted-foreground">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          className="inline-flex items-center gap-2 rounded-full border bg-muted/50 px-3 py-1 text-sm text-muted-foreground"
+        >
           <ListChecks className="size-3.5" />
           Open-source project management demo
-        </div>
+        </motion.div>
 
-        <h1 className="max-w-3xl text-5xl font-bold tracking-tight sm:text-6xl">
+        <motion.h1
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.1 }}
+          className="max-w-3xl text-5xl font-bold tracking-tight sm:text-6xl"
+        >
           Manage projects,
           <br />
           <span className="text-primary">not chaos.</span>
-        </h1>
+        </motion.h1>
 
-        <p className="max-w-lg text-lg text-muted-foreground">
+        <motion.p
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.2 }}
+          className="max-w-lg text-lg text-muted-foreground"
+        >
           A lightweight, role-based project management tool for teams that want
           clarity without the complexity. Built with React, TypeScript, and
           modern tooling.
-        </p>
+        </motion.p>
 
-        {isAuthenticated && role
-          ? (
-              <Button size="lg" asChild>
-                <Link to={ROLE_HOME_ROUTE[role]}>
-                  Go to Dashboard
-                  <ArrowRight className="size-4" />
-                </Link>
-              </Button>
-            )
-          : (
-              <div className="flex gap-3">
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.6, delay: 0.3 }}
+        >
+          {isAuthenticated && role
+            ? (
                 <Button size="lg" asChild>
-                  <Link to={paths.auth.signin.path}>
-                    Try the Demo
+                  <Link to={ROLE_HOME_ROUTE[role]}>
+                    Go to Dashboard
                     <ArrowRight className="size-4" />
                   </Link>
                 </Button>
-                <Button size="lg" variant="outline" asChild>
-                  <Link to={paths.auth.signup.path}>Create Account</Link>
-                </Button>
-              </div>
-            )}
+              )
+            : (
+                <div className="flex gap-3">
+                  <MotionButton
+                    size="lg"
+                    asChild
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.98 }}
+                  >
+                    <Link to={paths.auth.signin.path}>
+                      Try the Demo
+                      <ArrowRight className="size-4" />
+                    </Link>
+                  </MotionButton>
+                  <Button size="lg" variant="outline" asChild>
+                    <Link to={paths.auth.signup.path}>Create Account</Link>
+                  </Button>
+                </div>
+              )}
+        </motion.div>
 
-        <p className="text-xs text-muted-foreground">
+        <motion.p
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.6, delay: 0.35 }}
+          className="text-xs text-muted-foreground"
+        >
           No server required — runs entirely in your browser with mock data
-        </p>
+        </motion.p>
 
         {/* Dashboard Preview Mockup */}
-        <div className="relative mx-auto mt-8 w-full max-w-5xl overflow-hidden rounded-xl border border-border/60 bg-card shadow-2xl ring-1 ring-black/5 dark:ring-white/10">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.92 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.8, delay: 0.5, ease: [0.16, 1, 0.3, 1] }}
+          className="relative mx-auto mt-8 w-full max-w-5xl overflow-hidden rounded-xl border border-border/60 bg-card shadow-2xl ring-1 ring-black/5 dark:ring-white/10"
+        >
           <div className="flex" style={{ aspectRatio: "16/10" }}>
             {/* Sidebar mock */}
             <div className="hidden w-14 shrink-0 border-r bg-muted/60 p-2 sm:block">
@@ -114,11 +203,11 @@ export default function LandingRoute() {
               <div className="grid flex-1 grid-cols-4 gap-3 p-4">
                 {["bg-blue-500/20", "bg-amber-500/20", "bg-purple-500/20", "bg-emerald-500/20"].map(
                   (color, colIdx) => (
-                    <div key={colIdx} className="flex flex-col gap-2">
+                    <div key={color} className="flex flex-col gap-2">
                       <div className={cn("h-2 w-16 rounded-full", color)} />
                       {Array.from({ length: 3 - (colIdx % 2) }).map((_, cardIdx) => (
                         <div
-                          key={cardIdx}
+                          key={`${color}-${cardIdx}`}
                           className="rounded-lg border bg-background p-2 shadow-sm"
                         >
                           <div className="mb-1.5 h-2 w-3/4 rounded bg-muted-foreground/15" />
@@ -132,35 +221,72 @@ export default function LandingRoute() {
             </div>
           </div>
           {/* Fade overlay */}
-          <div className="pointer-events-none absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-background to-transparent" />
-        </div>
+          <div className="pointer-events-none absolute inset-x-0 bottom-0 h-20 bg-linear-to-t from-background to-transparent" />
+        </motion.div>
       </section>
 
       {/* ── Social Proof ──────────────────────────────────────────────── */}
-      <section className="border-y bg-muted/30 px-page-x py-14">
+      <motion.section
+        variants={staggerContainer}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, amount: 0.3 }}
+        className="border-y bg-muted/30 px-page-x py-14"
+      >
         <div className="mx-auto grid max-w-4xl grid-cols-2 gap-8 sm:grid-cols-4">
           {SOCIAL_PROOF_STATS.map(stat => (
-            <div key={stat.label} className="text-center">
+            <motion.div
+              key={stat.label}
+              variants={fadeUp}
+              transition={{ duration: 0.5, ease: "easeOut" }}
+              className="text-center"
+            >
               <p className="text-3xl font-bold tracking-tight">{stat.value}</p>
               <p className="mt-1 text-sm text-muted-foreground">{stat.label}</p>
-            </div>
+            </motion.div>
           ))}
         </div>
-      </section>
+      </motion.section>
 
       {/* ── Features Grid ─────────────────────────────────────────────── */}
       <section className="px-page-x py-20">
         <div className="mx-auto max-w-5xl">
-          <h2 className="mb-2 text-center text-3xl font-semibold tracking-tight">
+          <motion.h2
+            variants={fadeUp}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.5 }}
+            transition={{ duration: 0.5 }}
+            className="mb-2 text-center text-3xl font-semibold tracking-tight"
+          >
             Everything you need to ship
-          </h2>
-          <p className="mx-auto mb-12 max-w-prose text-center text-lg text-muted-foreground">
+          </motion.h2>
+          <motion.p
+            variants={fadeIn}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.5 }}
+            transition={{ duration: 0.5, delay: 0.1 }}
+            className="mx-auto mb-12 max-w-prose text-center text-lg text-muted-foreground"
+          >
             From backlog to done — plan, track, and deliver with your team.
-          </p>
+          </motion.p>
 
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <motion.div
+            variants={staggerContainer}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.1 }}
+            className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3"
+          >
             {FEATURES.map(feature => (
-              <Card key={feature.title} className="border shadow-sm">
+              <MotionCard
+                key={feature.title}
+                variants={fadeUp}
+                transition={{ duration: 0.5, ease: "easeOut" }}
+                whileHover={{ y: -4, transition: { duration: 0.2 } }}
+                className="border shadow-sm"
+              >
                 <CardContent className="pt-6">
                   <div
                     className={cn(
@@ -175,35 +301,60 @@ export default function LandingRoute() {
                     {feature.description}
                   </p>
                 </CardContent>
-              </Card>
+              </MotionCard>
             ))}
-          </div>
+          </motion.div>
         </div>
       </section>
 
       {/* ── Product Screenshots ───────────────────────────────────────── */}
       <section className="border-y bg-muted/30 px-page-x py-20">
         <div className="mx-auto max-w-5xl">
-          <h2 className="mb-2 text-center text-3xl font-semibold tracking-tight">
+          <motion.h2
+            variants={fadeUp}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.5 }}
+            transition={{ duration: 0.5 }}
+            className="mb-2 text-center text-3xl font-semibold tracking-tight"
+          >
             See it in action
-          </h2>
-          <p className="mx-auto mb-12 max-w-prose text-center text-lg text-muted-foreground">
+          </motion.h2>
+          <motion.p
+            variants={fadeIn}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.5 }}
+            transition={{ duration: 0.5, delay: 0.1 }}
+            className="mx-auto mb-12 max-w-prose text-center text-lg text-muted-foreground"
+          >
             A glimpse at the core views that power your workflow.
-          </p>
+          </motion.p>
 
-          <div className="grid gap-6 md:grid-cols-3">
+          <motion.div
+            variants={staggerContainer}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.1 }}
+            className="grid gap-6 md:grid-cols-3"
+          >
             {/* Kanban Preview */}
-            <Card className="flex flex-col overflow-hidden">
+            <MotionCard
+              variants={scaleUp}
+              transition={{ duration: 0.5, ease: "easeOut" }}
+              whileHover={{ scale: 1.02, transition: { duration: 0.2 } }}
+              className="flex flex-col overflow-hidden"
+            >
               <CardContent className="flex flex-1 flex-col p-0">
                 <div className="flex-1 bg-muted/40 p-4">
                   <div className="grid grid-cols-3 gap-2">
                     {["bg-blue-400/30", "bg-amber-400/30", "bg-emerald-400/30"].map(
                       (color, col) => (
-                        <div key={col} className="space-y-2">
+                        <div key={color} className="space-y-2">
                           <div className={cn("h-1.5 w-10 rounded-full", color)} />
                           {Array.from({ length: 2 + col }).map((_, i) => (
                             <div
-                              key={i}
+                              key={`${color}-${i}`}
                               className="h-8 rounded border bg-background shadow-sm"
                             />
                           ))}
@@ -219,14 +370,19 @@ export default function LandingRoute() {
                   </p>
                 </div>
               </CardContent>
-            </Card>
+            </MotionCard>
 
             {/* Sprint Preview */}
-            <Card className="flex flex-col overflow-hidden">
+            <MotionCard
+              variants={scaleUp}
+              transition={{ duration: 0.5, ease: "easeOut" }}
+              whileHover={{ scale: 1.02, transition: { duration: 0.2 } }}
+              className="flex flex-col overflow-hidden"
+            >
               <CardContent className="flex flex-1 flex-col p-0">
                 <div className="flex-1 space-y-3 bg-muted/40 p-4">
-                  {[75, 45, 90].map((width, i) => (
-                    <div key={i} className="space-y-1">
+                  {[75, 45, 90].map(width => (
+                    <div key={width} className="space-y-1">
                       <div className="flex justify-between">
                         <div className="h-2 w-16 rounded bg-muted-foreground/15" />
                         <div className="h-2 w-6 rounded bg-muted-foreground/10" />
@@ -247,14 +403,19 @@ export default function LandingRoute() {
                   </p>
                 </div>
               </CardContent>
-            </Card>
+            </MotionCard>
 
             {/* Time Tracking Preview */}
-            <Card className="flex flex-col overflow-hidden">
+            <MotionCard
+              variants={scaleUp}
+              transition={{ duration: 0.5, ease: "easeOut" }}
+              whileHover={{ scale: 1.02, transition: { duration: 0.2 } }}
+              className="flex flex-col overflow-hidden"
+            >
               <CardContent className="flex flex-1 flex-col p-0">
                 <div className="flex-1 space-y-2 bg-muted/40 p-4">
-                  {[60, 80, 40, 55].map((width, i) => (
-                    <div key={i} className="flex items-center gap-2">
+                  {[60, 80, 40, 55].map(width => (
+                    <div key={width} className="flex items-center gap-2">
                       <div className="h-2 w-12 shrink-0 rounded bg-muted-foreground/15" />
                       <div className="h-4 flex-1 rounded bg-muted">
                         <div
@@ -273,24 +434,49 @@ export default function LandingRoute() {
                   </p>
                 </div>
               </CardContent>
-            </Card>
-          </div>
+            </MotionCard>
+          </motion.div>
         </div>
       </section>
 
       {/* ── How It Works ──────────────────────────────────────────────── */}
       <section className="px-page-x py-20">
         <div className="mx-auto max-w-5xl">
-          <h2 className="mb-2 text-center text-3xl font-semibold tracking-tight">
+          <motion.h2
+            variants={fadeUp}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.5 }}
+            transition={{ duration: 0.5 }}
+            className="mb-2 text-center text-3xl font-semibold tracking-tight"
+          >
             How it works
-          </h2>
-          <p className="mx-auto mb-12 max-w-prose text-center text-lg text-muted-foreground">
+          </motion.h2>
+          <motion.p
+            variants={fadeIn}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.5 }}
+            transition={{ duration: 0.5, delay: 0.1 }}
+            className="mx-auto mb-12 max-w-prose text-center text-lg text-muted-foreground"
+          >
             Get up and running in three simple steps.
-          </p>
+          </motion.p>
 
-          <div className="grid gap-8 md:grid-cols-3">
-            {HOW_IT_WORKS_STEPS.map(step => (
-              <div key={step.step} className="flex flex-col items-center text-center">
+          <motion.div
+            variants={staggerContainer}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.2 }}
+            className="grid gap-8 md:grid-cols-3"
+          >
+            {HOW_IT_WORKS_STEPS.map((step, i) => (
+              <motion.div
+                key={step.step}
+                variants={i === 0 ? slideLeft : i === 2 ? slideRight : fadeUp}
+                transition={{ duration: 0.6, ease: "easeOut" }}
+                className="flex flex-col items-center text-center"
+              >
                 <div className="mb-4 flex size-14 items-center justify-center rounded-full bg-primary/10">
                   <step.icon className="size-6 text-primary" />
                 </div>
@@ -303,25 +489,50 @@ export default function LandingRoute() {
                 <p className="text-sm text-muted-foreground">
                   {step.description}
                 </p>
-              </div>
+              </motion.div>
             ))}
-          </div>
+          </motion.div>
         </div>
       </section>
 
       {/* ── Roles ─────────────────────────────────────────────────────── */}
       <section className="border-y bg-muted/30 px-page-x py-20">
         <div className="mx-auto max-w-5xl">
-          <h2 className="mb-2 text-center text-3xl font-semibold tracking-tight">
+          <motion.h2
+            variants={fadeUp}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.5 }}
+            transition={{ duration: 0.5 }}
+            className="mb-2 text-center text-3xl font-semibold tracking-tight"
+          >
             Three roles, one workflow
-          </h2>
-          <p className="mx-auto mb-12 max-w-prose text-center text-lg text-muted-foreground">
+          </motion.h2>
+          <motion.p
+            variants={fadeIn}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.5 }}
+            transition={{ duration: 0.5, delay: 0.1 }}
+            className="mx-auto mb-12 max-w-prose text-center text-lg text-muted-foreground"
+          >
             Each role sees exactly what they need — no more, no less.
-          </p>
+          </motion.p>
 
-          <div className="grid gap-6 md:grid-cols-3">
+          <motion.div
+            variants={staggerContainer}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.1 }}
+            className="grid gap-6 md:grid-cols-3"
+          >
             {ROLE_CARDS.map(card => (
-              <Card key={card.role}>
+              <MotionCard
+                key={card.role}
+                variants={fadeUp}
+                transition={{ duration: 0.5, ease: "easeOut" }}
+                whileHover={{ y: -4, transition: { duration: 0.2 } }}
+              >
                 <CardContent className="pt-6">
                   <div className="mb-4 inline-flex size-10 items-center justify-center rounded-lg bg-primary/10">
                     <card.icon className="size-5 text-primary" />
@@ -339,25 +550,49 @@ export default function LandingRoute() {
                     ))}
                   </ul>
                 </CardContent>
-              </Card>
+              </MotionCard>
             ))}
-          </div>
+          </motion.div>
         </div>
       </section>
 
       {/* ── Testimonials ──────────────────────────────────────────────── */}
       <section className="px-page-x py-20">
         <div className="mx-auto max-w-5xl">
-          <h2 className="mb-2 text-center text-3xl font-semibold tracking-tight">
+          <motion.h2
+            variants={fadeUp}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.5 }}
+            transition={{ duration: 0.5 }}
+            className="mb-2 text-center text-3xl font-semibold tracking-tight"
+          >
             Loved by teams
-          </h2>
-          <p className="mx-auto mb-12 max-w-prose text-center text-lg text-muted-foreground">
+          </motion.h2>
+          <motion.p
+            variants={fadeIn}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.5 }}
+            transition={{ duration: 0.5, delay: 0.1 }}
+            className="mx-auto mb-12 max-w-prose text-center text-lg text-muted-foreground"
+          >
             See what others are saying about WorkSphere.
-          </p>
+          </motion.p>
 
-          <div className="grid gap-6 sm:grid-cols-2">
-            {TESTIMONIALS.map(t => (
-              <Card key={t.name}>
+          <motion.div
+            variants={staggerContainer}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.1 }}
+            className="grid gap-6 sm:grid-cols-2"
+          >
+            {TESTIMONIALS.map((t, i) => (
+              <MotionCard
+                key={t.name}
+                variants={i % 2 === 0 ? slideLeft : slideRight}
+                transition={{ duration: 0.5, ease: "easeOut" }}
+              >
                 <CardContent className="pt-6">
                   <Quote className="mb-3 size-5 text-primary/40" />
                   <p className="mb-4 text-sm leading-relaxed">{t.quote}</p>
@@ -372,31 +607,55 @@ export default function LandingRoute() {
                       <p className="text-xs text-muted-foreground">
                         {t.role}
                         ,
+                        {" "}
                         {t.company}
                       </p>
                     </div>
                   </div>
                 </CardContent>
-              </Card>
+              </MotionCard>
             ))}
-          </div>
+          </motion.div>
         </div>
       </section>
 
       {/* ── Pricing ───────────────────────────────────────────────────── */}
       <section className="border-y bg-muted/30 px-page-x py-20">
         <div className="mx-auto max-w-5xl">
-          <h2 className="mb-2 text-center text-3xl font-semibold tracking-tight">
+          <motion.h2
+            variants={fadeUp}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.5 }}
+            transition={{ duration: 0.5 }}
+            className="mb-2 text-center text-3xl font-semibold tracking-tight"
+          >
             Simple, transparent pricing
-          </h2>
-          <p className="mx-auto mb-12 max-w-prose text-center text-lg text-muted-foreground">
+          </motion.h2>
+          <motion.p
+            variants={fadeIn}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.5 }}
+            transition={{ duration: 0.5, delay: 0.1 }}
+            className="mx-auto mb-12 max-w-prose text-center text-lg text-muted-foreground"
+          >
             Start free and scale as your team grows.
-          </p>
+          </motion.p>
 
-          <div className="grid gap-6 md:grid-cols-3">
+          <motion.div
+            variants={staggerContainer}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.1 }}
+            className="grid gap-6 md:grid-cols-3"
+          >
             {PRICING_TIERS.map(tier => (
-              <Card
+              <MotionCard
                 key={tier.name}
+                variants={fadeUp}
+                transition={{ duration: 0.5, ease: "easeOut" }}
+                whileHover={{ y: -6, transition: { duration: 0.2 } }}
                 className={cn(
                   "relative flex flex-col",
                   tier.highlighted && "overflow-visible border-primary ring-1 ring-primary",
@@ -440,14 +699,21 @@ export default function LandingRoute() {
                     <Link to={paths.auth.signup.path}>{tier.cta}</Link>
                   </Button>
                 </CardFooter>
-              </Card>
+              </MotionCard>
             ))}
-          </div>
+          </motion.div>
         </div>
       </section>
 
       {/* ── FAQ ────────────────────────────────────────────────────────── */}
-      <section className="px-page-x py-20">
+      <motion.section
+        variants={fadeIn}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, amount: 0.2 }}
+        transition={{ duration: 0.6 }}
+        className="px-page-x py-20"
+      >
         <div className="mx-auto max-w-3xl">
           <h2 className="mb-2 text-center text-3xl font-semibold tracking-tight">
             Frequently asked questions
@@ -457,38 +723,60 @@ export default function LandingRoute() {
           </p>
 
           <Accordion type="single" collapsible>
-            {FAQ_ITEMS.map((item, i) => (
-              <AccordionItem key={i} value={`faq-${i}`}>
+            {FAQ_ITEMS.map(item => (
+              <AccordionItem key={item.question} value={item.question}>
                 <AccordionTrigger>{item.question}</AccordionTrigger>
                 <AccordionContent>{item.answer}</AccordionContent>
               </AccordionItem>
             ))}
           </Accordion>
         </div>
-      </section>
+      </motion.section>
 
       {/* ── Tech Stack ────────────────────────────────────────────────── */}
       <section className="border-y bg-muted/30 px-page-x py-16">
         <div className="mx-auto max-w-3xl text-center">
-          <h2 className="mb-6 text-2xl font-semibold tracking-tight">
+          <motion.h2
+            variants={fadeIn}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.5 }}
+            transition={{ duration: 0.5 }}
+            className="mb-6 text-2xl font-semibold tracking-tight"
+          >
             Built with
-          </h2>
-          <div className="flex flex-wrap justify-center gap-2">
+          </motion.h2>
+          <motion.div
+            variants={staggerContainerFast}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.3 }}
+            className="flex flex-wrap justify-center gap-2"
+          >
             {TECH_STACK.map(tech => (
-              <span
+              <motion.span
                 key={tech.name}
+                variants={scaleUp}
+                transition={{ duration: 0.3 }}
                 className="inline-flex items-center gap-2 rounded-full border bg-background px-3 py-1.5 text-sm"
               >
                 <tech.icon className="size-3.5 text-muted-foreground" />
                 {tech.name}
-              </span>
+              </motion.span>
             ))}
-          </div>
+          </motion.div>
         </div>
       </section>
 
       {/* ── CTA ───────────────────────────────────────────────────────── */}
-      <section className="px-page-x py-20 text-center">
+      <motion.section
+        variants={scaleUp}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, amount: 0.3 }}
+        transition={{ duration: 0.6, ease: "easeOut" }}
+        className="px-page-x py-20 text-center"
+      >
         <h2 className="mb-3 text-3xl font-semibold tracking-tight">
           Ready to explore?
         </h2>
@@ -496,17 +784,29 @@ export default function LandingRoute() {
           Sign in with a test account and see it in action.
         </p>
         {!isAuthenticated && (
-          <Button size="lg" asChild>
+          <MotionButton
+            size="lg"
+            asChild
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.98 }}
+          >
             <Link to={paths.auth.signin.path}>
               Get Started
               <ArrowRight className="size-4" />
             </Link>
-          </Button>
+          </MotionButton>
         )}
-      </section>
+      </motion.section>
 
       {/* ── Footer ────────────────────────────────────────────────────── */}
-      <footer className="border-t px-page-x py-12">
+      <motion.footer
+        variants={fadeIn}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, amount: 0.2 }}
+        transition={{ duration: 0.6 }}
+        className="border-t px-page-x py-12"
+      >
         <div className="mx-auto max-w-5xl">
           <div className="grid grid-cols-2 gap-8 md:grid-cols-4">
             {FOOTER_LINKS.map(group => (
@@ -537,7 +837,7 @@ export default function LandingRoute() {
             </p>
           </div>
         </div>
-      </footer>
+      </motion.footer>
     </main>
   );
 }
