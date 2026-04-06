@@ -20,7 +20,7 @@ export default antfu({
     "@typescript-eslint/no-explicit-any": "error",
 
     // Allow const + type same-name pattern (e.g., ROLES const + Role type)
-    "ts/no-redeclare": "off",
+    "ts/no-redeclare": ["error", { ignoreDeclarationMerge: true }],
 
     // Catch dead code early — prefix unused with _ to keep intentionally
     "ts/no-unused-vars": ["error", {

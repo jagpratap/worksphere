@@ -17,36 +17,43 @@ A role-based project management SaaS application — think lightweight Jira meet
 ## Features
 
 ### Authentication & Authorization
+
 - Role-based access control (Admin / Manager / Member)
 - Sign in, sign up, forgot/reset password flows
 - Route guards with automatic redirects
 
 ### Project Management
+
 - Create, edit, archive projects
 - Kanban board with drag-and-drop task reordering
 - Project overview with member management
 
 ### Task Management
+
 - Full CRUD with status, priority, assignee, sprint assignment
 - URL-synced filters (status, priority, assignee, search)
 - My Tasks page with personal task view
 
 ### Sprint Planning
+
 - Create sprints with date ranges, goals, and status tracking
 - Progress bars with task completion stats
 - Max one active sprint per project enforcement
 
 ### Time Tracking
+
 - Log time entries against tasks (manual entry)
 - Daily/weekly summary stats
 - Filter and search entries
 
 ### Team Workload
+
 - Visual task distribution per team member
 - Status breakdown with colored progress bars
 - Filter by project
 
 ### Coming Soon
+
 - Admin Dashboard analytics & charts
 - User management (CRUD)
 - Billing & subscription management
@@ -63,11 +70,11 @@ This app runs entirely in the browser using **MSW (Mock Service Worker)**. No ba
 
 All accounts use password: `password123`
 
-| Role | Email | Access |
-|------|-------|--------|
-| Admin | `admin@worksphere.dev` | Full system access |
-| Manager | `bob@worksphere.dev` | Projects, sprints, workload |
-| Member | `carol@worksphere.dev` | My tasks, time tracker |
+| Role    | Email                  | Access                      |
+| ------- | ---------------------- | --------------------------- |
+| Admin   | `admin@worksphere.dev` | Full system access          |
+| Manager | `bob@worksphere.dev`   | Projects, sprints, workload |
+| Member  | `carol@worksphere.dev` | My tasks, time tracker      |
 
 ## Getting Started
 

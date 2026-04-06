@@ -1,0 +1,34 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+    paths-ignore: ["**.md", "docs/**", LICENSE]
+  pull_request:
+    branches: [main]
+    paths-ignore: ["**.md", "docs/**", LICENSE]
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup
+      - run: pnpm lint
+
+  build:
+    runs-on: ubuntu-latest
+    needs: lint
+    timeout-minutes: 10
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup
+      - run: pnpm build
