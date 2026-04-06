@@ -1,6 +1,6 @@
 import { isRouteErrorResponse, Link, useRouteError } from "react-router";
 
-import { paths } from "@/config/paths";
+import { paths } from "@/config/path";
 
 import { PageContainer } from "./PageContainer";
 
@@ -13,6 +13,7 @@ export function ErrorFallback() {
 
   let status = 500;
   let message = "Something went wrong";
+  let message = "";
 
   if (isRouteErrorResponse(error)) {
     status = error.status;
