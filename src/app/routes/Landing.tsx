@@ -106,7 +106,7 @@ export default function LandingRoute() {
           className="inline-flex items-center gap-2 rounded-full border bg-muted/50 px-3 py-1 text-sm text-muted-foreground"
         >
           <ListChecks className="size-3.5" />
-          Open-source project management demo
+          Open-source project management
         </motion.div>
 
         <motion.h1
