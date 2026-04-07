@@ -1,8 +1,9 @@
+import { Analytics } from "@vercel/analytics/react";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 
-import { App } from "./app";
 import "./index.css";
+import { App } from "./app";
 import { ENV } from "./config/env";
 
 async function bootstrap() {
@@ -14,6 +15,7 @@ async function bootstrap() {
   createRoot(document.getElementById("root")!).render(
     <StrictMode>
       <App />
+      <Analytics />
     </StrictMode>,
   );
 }
