@@ -21,7 +21,7 @@ export type FieldError = {
   message: string;
 };
 
-// ── Auth Tokens ─────────────────────────────────────────────────────────────
+// ── Auth Token ─────────────────────────────────────────────────────────────
 
 export type AuthTokens = {
   accessToken: string;
